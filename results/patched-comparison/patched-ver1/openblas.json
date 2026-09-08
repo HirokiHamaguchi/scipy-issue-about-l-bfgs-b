@@ -1,0 +1,1566 @@
+{
+  "backend": "openblas",
+  "python": "3.14.7 | packaged by conda-forge | (main, Sep  2 2026, 21:08:32) [GCC 15.3.0]",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "numpy": "2.5.3",
+  "scipy": "2.0.0.dev0+git20260908.c18ebd1",
+  "scipy_git_revision": "c18ebd1c4871ff1a04c397247815d859eec54de5",
+  "scipy_file": "/home/hirok/Hobby/scipy-patched-ver1/build-patched-ver1-install/usr/lib/python3.14/site-packages/scipy/__init__.py",
+  "threadpools": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 8,
+      "prefix": "libopenblas",
+      "filepath": "/home/hirok/anaconda3/envs/scipy-dev-patched-ver1/lib/libopenblasp-r0.3.34.so",
+      "version": "0.3.34",
+      "threading_layer": "pthreads",
+      "architecture": "Haswell"
+    }
+  ],
+  "dimensions": [
+    500,
+    1000,
+    3000,
+    5000,
+    7500,
+    9000,
+    10000,
+    11000,
+    12000,
+    13000,
+    14000,
+    15000,
+    20000,
+    30000,
+    50000,
+    75000,
+    100000,
+    300000,
+    1000000
+  ],
+  "memory": 10,
+  "repeats": 5,
+  "rows": [
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 500,
+      "seconds": [
+        0.028470900004322175,
+        0.018648699995537754,
+        0.01773729999695206,
+        0.017737598995154258,
+        0.017712100001517683
+      ],
+      "median_seconds": 0.017737598995154258,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 1000,
+      "seconds": [
+        0.028624599995964672,
+        0.04201939899940044,
+        0.04749409999931231,
+        0.029527499005780555,
+        0.02467850000539329
+      ],
+      "median_seconds": 0.029527499005780555,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 3000,
+      "seconds": [
+        0.05231819899927359,
+        0.05093489999853773,
+        0.08527189800224733,
+        0.061047399998642504,
+        0.04720639900187962
+      ],
+      "median_seconds": 0.05231819899927359,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 5000,
+      "seconds": [
+        0.10466619900398655,
+        0.07411709900043206,
+        0.07607619900227292,
+        0.06458999899768969,
+        0.06855839899799321
+      ],
+      "median_seconds": 0.07411709900043206,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 7500,
+      "seconds": [
+        0.10093579899694305,
+        0.0966857980019995,
+        0.17118689799826825,
+        0.08757129900186555,
+        0.09307829900353681
+      ],
+      "median_seconds": 0.0966857980019995,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 9000,
+      "seconds": [
+        0.20400199700088706,
+        0.12131549899640959,
+        0.10156429799826583,
+        0.09485269900324056,
+        0.11878159899788443
+      ],
+      "median_seconds": 0.11878159899788443,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 10000,
+      "seconds": [
+        0.22279449699999532,
+        0.15083709800092038,
+        0.11788919800164877,
+        0.178102197998669,
+        0.23818609700538218
+      ],
+      "median_seconds": 0.178102197998669,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 11000,
+      "seconds": [
+        0.22248979700088967,
+        0.16554859800089616,
+        0.18115909799962537,
+        0.21825499699480133,
+        0.22428469700389542
+      ],
+      "median_seconds": 0.21825499699480133,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 12000,
+      "seconds": [
+        0.22849819700059015,
+        0.17523759799951222,
+        0.20404229700216092,
+        0.2873522959998809,
+        0.2818579970044084
+      ],
+      "median_seconds": 0.22849819700059015,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 13000,
+      "seconds": [
+        0.2937532969954191,
+        0.19091569800366415,
+        0.28835849699680693,
+        0.2476275969966082,
+        0.2510438970057294
+      ],
+      "median_seconds": 0.2510438970057294,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 14000,
+      "seconds": [
+        0.25425729699782096,
+        0.20300869799393695,
+        0.26556029700441286,
+        0.279366797003604,
+        0.27178069700312335
+      ],
+      "median_seconds": 0.26556029700441286,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 15000,
+      "seconds": [
+        0.26706899700366193,
+        0.3627404970029602,
+        0.27771679700526875,
+        0.2757039970019832,
+        0.25899729700176977
+      ],
+      "median_seconds": 0.2757039970019832,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 20000,
+      "seconds": [
+        0.333708995996858,
+        0.3897261960009928,
+        0.37584509599400917,
+        0.33841069600021,
+        0.36816209600510774
+      ],
+      "median_seconds": 0.36816209600510774,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 30000,
+      "seconds": [
+        0.53789539400168,
+        0.9533243900004891,
+        0.4262812950037187,
+        0.4449237959997845,
+        0.4295971969986567
+      ],
+      "median_seconds": 0.4449237959997845,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 50000,
+      "seconds": [
+        1.3257690879981965,
+        1.0291842910010018,
+        1.0776149910016102,
+        0.9848815919976914,
+        0.9854193909995956
+      ],
+      "median_seconds": 1.0291842910010018,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 75000,
+      "seconds": [
+        2.053582982996886,
+        1.6916312879984616,
+        1.5832393880045856,
+        2.0361023860023124,
+        1.6837198880020878
+      ],
+      "median_seconds": 1.6916312879984616,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 100000,
+      "seconds": [
+        2.5226323819952086,
+        2.3402977849982562,
+        2.493883682996966,
+        2.248803686001338,
+        2.1717915879999055
+      ],
+      "median_seconds": 2.3402977849982562,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 300000,
+      "seconds": [
+        6.923727769004472,
+        6.586481393002032,
+        6.619574793003267,
+        7.163267994998023,
+        6.8518424079957185
+      ],
+      "median_seconds": 6.8518424079957185,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": "default",
+      "dimension": 1000000,
+      "seconds": [
+        34.844575324998004,
+        29.069490519999817,
+        31.975099333998514,
+        29.09071857899835,
+        30.82229373700102
+      ],
+      "median_seconds": 30.82229373700102,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 500,
+      "seconds": [
+        0.016019988994230516,
+        0.009800493004149757,
+        0.010305092997441534,
+        0.007958393995068036,
+        0.009266693996323738
+      ],
+      "median_seconds": 0.009800493004149757,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 1.0823032597884704e-06,
+      "gradient_inf_norm": 0.002275145455277603,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 1000,
+      "seconds": [
+        0.012280590999580454,
+        0.011713892003172077,
+        0.009191893004754093,
+        0.00884229400253389,
+        0.008110194001346827
+      ],
+      "median_seconds": 0.009191893004754093,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 0.000818889397977923,
+      "gradient_inf_norm": 0.05903200274395105,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 3000,
+      "seconds": [
+        0.01943448699603323,
+        0.01695018799364334,
+        0.017366487998515368,
+        0.015332288996432908,
+        0.015599489001033362
+      ],
+      "median_seconds": 0.01695018799364334,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 0.08457009830902602,
+      "gradient_inf_norm": 0.8651312824713895,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 5000,
+      "seconds": [
+        0.028857580000476446,
+        0.028654080000706017,
+        0.03089307800109964,
+        0.025598381995223463,
+        0.023597883999173064
+      ],
+      "median_seconds": 0.028654080000706017,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 0.29819980091017734,
+      "gradient_inf_norm": 0.5310785818455361,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 7500,
+      "seconds": [
+        0.03617687400401337,
+        0.04492576899792766,
+        0.053965161998348776,
+        0.0319918780005537,
+        0.027967679998255335
+      ],
+      "median_seconds": 0.03617687400401337,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 0.7429481512867733,
+      "gradient_inf_norm": 0.845476883219939,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 9000,
+      "seconds": [
+        0.04278797000006307,
+        0.03991007200238528,
+        0.03731887399771949,
+        0.03512267600308405,
+        0.03214897800353356
+      ],
+      "median_seconds": 0.03731887399771949,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 107,
+      "final_objective": 1.052274464957933,
+      "gradient_inf_norm": 1.3403523449028445,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 10000,
+      "seconds": [
+        0.05681275999813806,
+        0.06611085400072625,
+        0.04327887000545161,
+        0.03440487600164488,
+        0.038728172999981325
+      ],
+      "median_seconds": 0.04327887000545161,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 1.2359235103385489,
+      "gradient_inf_norm": 3.121662598980162,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 11000,
+      "seconds": [
+        0.09660143299697665,
+        0.08372564099408919,
+        0.05490986200311454,
+        0.050562764998176135,
+        0.04945446500641992
+      ],
+      "median_seconds": 0.05490986200311454,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 1.646493706055214,
+      "gradient_inf_norm": 1.2951004749087827,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 12000,
+      "seconds": [
+        0.07701934599754168,
+        0.053928462002659217,
+        0.06635015399660915,
+        0.05299576300603803,
+        0.055128660998889245
+      ],
+      "median_seconds": 0.055128660998889245,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 2.0138058486072397,
+      "gradient_inf_norm": 1.3872235231496526,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 13000,
+      "seconds": [
+        0.07915684500039788,
+        0.05731545900198398,
+        0.05786565999733284,
+        0.057914159006031696,
+        0.05857426000147825
+      ],
+      "median_seconds": 0.057914159006031696,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 2.2328223215801986,
+      "gradient_inf_norm": 10.244822951832315,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 14000,
+      "seconds": [
+        0.0815130430055433,
+        0.24039743200410157,
+        0.061513657004979905,
+        0.06414195500110509,
+        0.07670644699828699
+      ],
+      "median_seconds": 0.07670644699828699,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 2.7016543326384275,
+      "gradient_inf_norm": 3.1904659070847656,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 15000,
+      "seconds": [
+        0.09345863500493579,
+        0.12256411399721401,
+        0.11716651800088584,
+        0.06785215299896663,
+        0.06787385200004792
+      ],
+      "median_seconds": 0.09345863500493579,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 2.965454902344306,
+      "gradient_inf_norm": 1.7013313778132986,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 20000,
+      "seconds": [
+        0.24906572599866195,
+        0.10551192600541981,
+        0.08611653999832924,
+        0.10351042800175492,
+        0.10982572300417814
+      ],
+      "median_seconds": 0.10551192600541981,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 5.539504153112269,
+      "gradient_inf_norm": 17.48504379808523,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 30000,
+      "seconds": [
+        0.17236167899682187,
+        0.15160359400033485,
+        0.1406443020023289,
+        0.2263882410043152,
+        0.18550217099982547
+      ],
+      "median_seconds": 0.17236167899682187,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 12.239319912162967,
+      "gradient_inf_norm": 4.373600322868991,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 50000,
+      "seconds": [
+        0.34479385900340276,
+        0.34461955900042085,
+        0.3643561450007837,
+        0.4479544869973324,
+        0.37058504100423306
+      ],
+      "median_seconds": 0.3643561450007837,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 34.74342004131959,
+      "gradient_inf_norm": 6.604139030459862,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 75000,
+      "seconds": [
+        0.5803991939974367,
+        0.6340709590003826,
+        0.5290682740014745,
+        0.5228945740018389,
+        0.6304767679976067
+      ],
+      "median_seconds": 0.5803991939974367,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 108,
+      "final_objective": 79.15667454722934,
+      "gradient_inf_norm": 12.065123109892719,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 100000,
+      "seconds": [
+        0.8021104599974933,
+        1.0143688489988563,
+        0.7843601610002224,
+        0.7399510629984434,
+        0.6986082649964374
+      ],
+      "median_seconds": 0.7843601610002224,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 144.90234878385075,
+      "gradient_inf_norm": 11.937494777612402,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 300000,
+      "seconds": [
+        2.372185782995075,
+        2.273613398996531,
+        2.11328020599467,
+        2.217228700996202,
+        2.231308836999233
+      ],
+      "median_seconds": 2.231308836999233,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 107,
+      "final_objective": 1180.8437294182472,
+      "gradient_inf_norm": 44.89233179574469,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": "default",
+      "dimension": 1000000,
+      "seconds": [
+        9.53166419500485,
+        10.526474121994397,
+        9.224912126002891,
+        9.502317923004739,
+        9.282598096004222
+      ],
+      "median_seconds": 9.502317923004739,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 13682.821079751971,
+      "gradient_inf_norm": 298.34463087577996,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 500,
+      "seconds": [
+        0.03196378699794877,
+        0.026696287997765467,
+        0.02251369100122247,
+        0.022737489998689853,
+        0.02157709099992644
+      ],
+      "median_seconds": 0.022737489998689853,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 1000,
+      "seconds": [
+        0.027270688995486125,
+        0.026197689003311098,
+        0.025066688998776954,
+        0.023203691001981497,
+        0.02330198999698041
+      ],
+      "median_seconds": 0.025066688998776954,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 3000,
+      "seconds": [
+        0.05526277600438334,
+        0.04502868200506782,
+        0.04496568100148579,
+        0.04044888300268212,
+        0.04394028100068681
+      ],
+      "median_seconds": 0.04496568100148579,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 5000,
+      "seconds": [
+        0.10737805499957176,
+        0.06878297100047348,
+        0.06461417300306493,
+        0.05777727600070648,
+        0.10834385499765631
+      ],
+      "median_seconds": 0.06878297100047348,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 7500,
+      "seconds": [
+        0.20822061299986672,
+        0.15018643799703568,
+        0.09951575800369028,
+        0.11415205200319178,
+        0.12082625000039116
+      ],
+      "median_seconds": 0.12082625000039116,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 9000,
+      "seconds": [
+        0.1733408279978903,
+        0.14757783800450852,
+        0.14436333999765338,
+        0.13820384200516855,
+        0.13014374500198755
+      ],
+      "median_seconds": 0.14436333999765338,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 10000,
+      "seconds": [
+        0.16576373100542696,
+        0.15242383599979803,
+        0.18794532099855132,
+        0.28197478199581383,
+        0.24100390000239713
+      ],
+      "median_seconds": 0.18794532099855132,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 11000,
+      "seconds": [
+        0.31462676799856126,
+        0.20474561500304844,
+        0.23449270199489547,
+        0.18395242300175596,
+        0.24242659800074762
+      ],
+      "median_seconds": 0.23449270199489547,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 12000,
+      "seconds": [
+        0.25604802899761125,
+        0.14948317100061104,
+        0.16812096599460347,
+        0.19193116200040095,
+        0.19125196199456695
+      ],
+      "median_seconds": 0.19125196199456695,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 13000,
+      "seconds": [
+        0.23735445199417882,
+        0.33751583300181665,
+        0.21941345599771012,
+        0.31525353799952427,
+        0.19601546099875122
+      ],
+      "median_seconds": 0.23735445199417882,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 14000,
+      "seconds": [
+        0.2877657439967152,
+        0.18665516499459045,
+        0.24042605500289937,
+        0.24134165400027996,
+        0.3132709409983363
+      ],
+      "median_seconds": 0.24134165400027996,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 15000,
+      "seconds": [
+        0.30087944400293054,
+        0.2453353539967793,
+        0.2883587449978222,
+        0.23866085499321343,
+        0.3007160440029111
+      ],
+      "median_seconds": 0.2883587449978222,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 20000,
+      "seconds": [
+        0.42997621899849037,
+        0.3630546319982386,
+        0.5333967989936355,
+        0.405858824000461,
+        0.40361072400264675
+      ],
+      "median_seconds": 0.405858824000461,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 30000,
+      "seconds": [
+        0.6475383780052653,
+        0.6652649749958073,
+        0.6811665720015299,
+        0.5868534900000668,
+        0.5719079920017975
+      ],
+      "median_seconds": 0.6475383780052653,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 50000,
+      "seconds": [
+        1.392650378998951,
+        1.176631720001751,
+        1.2145302099961555,
+        1.0387599530004081,
+        1.1995047140007955
+      ],
+      "median_seconds": 1.1995047140007955,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 75000,
+      "seconds": [
+        2.2104933000009623,
+        1.9785162599946489,
+        1.9497962050008937,
+        1.7492598750031902,
+        2.011215264996281
+      ],
+      "median_seconds": 1.9785162599946489,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 100000,
+      "seconds": [
+        2.874275904003298,
+        2.559026056995208,
+        2.4331176679988857,
+        2.3613072790030856,
+        2.464768001002085
+      ],
+      "median_seconds": 2.464768001002085,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 300000,
+      "seconds": [
+        8.573672213002283,
+        8.246090050997736,
+        8.55237049999414,
+        8.302581613999791,
+        8.557226228993386
+      ],
+      "median_seconds": 8.55237049999414,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "zero_chain",
+      "blas_threads": 1,
+      "dimension": 1000000,
+      "seconds": [
+        31.680493058003776,
+        32.495249375999265,
+        32.03374211900518,
+        31.4575504500026,
+        31.255044252000516
+      ],
+      "median_seconds": 31.680493058003776,
+      "requested_iterations": 300,
+      "iterations": 300,
+      "function_evaluations": 309,
+      "final_objective": -0.4981633470337196,
+      "gradient_inf_norm": 0.0005202668311477436,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 500,
+      "seconds": [
+        0.006803000003856141,
+        0.0077415999985532835,
+        0.00904659999650903,
+        0.009771700002602302,
+        0.009708300000056624
+      ],
+      "median_seconds": 0.00904659999650903,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 1.0823032597884704e-06,
+      "gradient_inf_norm": 0.002275145455277603,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 1000,
+      "seconds": [
+        0.01593519999732962,
+        0.01461350000317907,
+        0.014693899000121746,
+        0.013668700004927814,
+        0.015884200001892168
+      ],
+      "median_seconds": 0.014693899000121746,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 0.000818889397977923,
+      "gradient_inf_norm": 0.05903200274395105,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 3000,
+      "seconds": [
+        0.03153510000265669,
+        0.02766680000058841,
+        0.02919249900151044,
+        0.026866899999731686,
+        0.029678999999305233
+      ],
+      "median_seconds": 0.02919249900151044,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 0.08457009830902602,
+      "gradient_inf_norm": 0.8651312824713895,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 5000,
+      "seconds": [
+        0.04950589999498334,
+        0.04354679900279734,
+        0.027159799996297807,
+        0.02183579999837093,
+        0.021895999998378102
+      ],
+      "median_seconds": 0.027159799996297807,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 0.29819980091017734,
+      "gradient_inf_norm": 0.5310785818455361,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 7500,
+      "seconds": [
+        0.07176859899482224,
+        0.05513069999869913,
+        0.03492639899923233,
+        0.027437400000053458,
+        0.028518700004497077
+      ],
+      "median_seconds": 0.03492639899923233,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 0.7429481512867733,
+      "gradient_inf_norm": 0.845476883219939,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 9000,
+      "seconds": [
+        0.0511910990026081,
+        0.05320969999593217,
+        0.0625791990023572,
+        0.05068610000307672,
+        0.029824000004737172
+      ],
+      "median_seconds": 0.0511910990026081,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 107,
+      "final_objective": 1.052274464957933,
+      "gradient_inf_norm": 1.3403523449028445,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 10000,
+      "seconds": [
+        0.05718639899714617,
+        0.07106620000558905,
+        0.04938539900467731,
+        0.042247200006386265,
+        0.06065099900297355
+      ],
+      "median_seconds": 0.05718639899714617,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 1.2359235103385489,
+      "gradient_inf_norm": 3.121662598980162,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 11000,
+      "seconds": [
+        0.05695420000120066,
+        0.04670350000378676,
+        0.08232859899726463,
+        0.04522139899927424,
+        0.04602159999922151
+      ],
+      "median_seconds": 0.04670350000378676,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 1.646493717153159,
+      "gradient_inf_norm": 1.295100350306089,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 12000,
+      "seconds": [
+        0.08413729899621103,
+        0.0840567999985069,
+        0.0660306989957462,
+        0.04603389999829233,
+        0.0467280990051222
+      ],
+      "median_seconds": 0.0660306989957462,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 2.0138058484414114,
+      "gradient_inf_norm": 1.3872235230924004,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 13000,
+      "seconds": [
+        0.08529170000110753,
+        0.08560259899968514,
+        0.06571149899536977,
+        0.06647510000038892,
+        0.0687407989971689
+      ],
+      "median_seconds": 0.0687407989971689,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 2.232822345595329,
+      "gradient_inf_norm": 10.244824691285576,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 14000,
+      "seconds": [
+        0.07799300000624498,
+        0.08027319899701979,
+        0.05587680000462569,
+        0.05290159900323488,
+        0.06490080000367016
+      ],
+      "median_seconds": 0.06490080000367016,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 2.7016567713051365,
+      "gradient_inf_norm": 3.1905039683889553,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 15000,
+      "seconds": [
+        0.11019829900033073,
+        0.058229799004038796,
+        0.060945400000491645,
+        0.058556798998324666,
+        0.060754199999792036
+      ],
+      "median_seconds": 0.060754199999792036,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 104,
+      "final_objective": 2.965454763765284,
+      "gradient_inf_norm": 1.701331314852833,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 20000,
+      "seconds": [
+        0.10257639899646165,
+        0.0948910990045988,
+        0.08775359900027979,
+        0.12894699900061823,
+        0.1187528989976272
+      ],
+      "median_seconds": 0.10257639899646165,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 5.539504172883275,
+      "gradient_inf_norm": 17.48505374547536,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 30000,
+      "seconds": [
+        0.24444789799599675,
+        0.2064683979988331,
+        0.2917538970068563,
+        0.22459349800192285,
+        0.29347139799938304
+      ],
+      "median_seconds": 0.24444789799599675,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 12.239319620954365,
+      "gradient_inf_norm": 4.373600014677266,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 50000,
+      "seconds": [
+        0.44796689599752426,
+        0.4958027949978714,
+        0.4794176960058394,
+        0.44225099599862006,
+        0.38009649599553086
+      ],
+      "median_seconds": 0.44796689599752426,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 106,
+      "final_objective": 34.743420078838824,
+      "gradient_inf_norm": 6.604137690626274,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 75000,
+      "seconds": [
+        0.827042793003784,
+        0.6706982939940644,
+        0.7266613940009847,
+        0.6708627930056537,
+        0.6916741940003703
+      ],
+      "median_seconds": 0.6916741940003703,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 108,
+      "final_objective": 79.15667819152723,
+      "gradient_inf_norm": 12.064926450754184,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 100000,
+      "seconds": [
+        0.8804905439974391,
+        0.9509639850002714,
+        0.9083340810029767,
+        0.7977272710049874,
+        0.8159136719987146
+      ],
+      "median_seconds": 0.8804905439974391,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 144.90240916627698,
+      "gradient_inf_norm": 11.937498963539424,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 300000,
+      "seconds": [
+        2.989871265999682,
+        2.668949380000413,
+        2.775349080999149,
+        2.7074645820030128,
+        2.771194289001869
+      ],
+      "median_seconds": 2.771194289001869,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 107,
+      "final_objective": 1180.8437299838477,
+      "gradient_inf_norm": 44.892333571165736,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "problem": "diagonal_quadratic",
+      "blas_threads": 1,
+      "dimension": 1000000,
+      "seconds": [
+        10.363630101004674,
+        10.59136966799997,
+        10.24645724400034,
+        10.516180036996957,
+        10.468960634003452
+      ],
+      "median_seconds": 10.468960634003452,
+      "requested_iterations": 100,
+      "iterations": 100,
+      "function_evaluations": 105,
+      "final_objective": 13591.8900528758,
+      "gradient_inf_norm": 285.1852751733737,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    }
+  ]
+}

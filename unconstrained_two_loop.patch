@@ -1,0 +1,88 @@
+diff --git a/scipy/optimize/src/lbfgsb.c b/scipy/optimize/src/lbfgsb.c
+--- a/scipy/optimize/src/lbfgsb.c
++++ b/scipy/optimize/src/lbfgsb.c
+@@ -83,6 +83,11 @@ static void cmprlb(
+     double theta, CBLAS_INT col, CBLAS_INT head, CBLAS_INT nfree,
+     CBLAS_INT cnstnd, CBLAS_INT* info
+ );
++static void unconstrained_direction(
++    CBLAS_INT n, CBLAS_INT m, double* x, double* g, double* z,
++    double* ws, double* wy, double* sy, double theta, CBLAS_INT col,
++    CBLAS_INT head, double* alpha
++);
+ static void errclb(
+     CBLAS_INT n, CBLAS_INT m, double factr, double* l,
+     double* u, CBLAS_INT* nbd, CBLAS_INT* task, CBLAS_INT* task_msg, CBLAS_INT* info, CBLAS_INT* k
+@@ -826,15 +831,17 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+             freev(n, &nfree, index, &nenter, &ileave, indx2, iwhere, &wrk, updatd,
+                 cnstnd, iter);
+             nact = n - nfree;
+         } else {
+-            BLAS_FUNC(dcopy)(&n, x, &one_int, z, &one_int);
+-            wrk = updatd;
++            // For an unconstrained problem, use the standard L-BFGS two-loop
++            // recursion instead of forming and solving the box subspace system.
++            unconstrained_direction(n, m, x, g, z, ws, wy, sy, theta, col, head, wa);
++            wrk = 0;
+             nseg = 0;
+         } 
+ 
+         // If there are no free variables or B=theta*I, then skip the subspace
+         // minimization.
+-        if ((nfree != 0) && (col != 0))
++        if (cnstnd && (nfree != 0) && (col != 0))
+         {
+             /////////////////////////////////////////////////////
+             //
+@@ -1821,6 +1828,51 @@ cmprlb(CBLAS_INT n, CBLAS_INT m, double* x, double* g,
+ }
+ 
+ 
++static void
++unconstrained_direction(CBLAS_INT n, CBLAS_INT m, double* x, double* g,
++                        double* z, double* ws, double* wy, double* sy,
++                        double theta, CBLAS_INT col, CBLAS_INT head,
++                        double* alpha)
++{
++    CBLAS_INT i, pointr, one_int = 1;
++    double beta, coefficient;
++    double one = 1.0, minus_one = -1.0;
++    double scale = 1.0 / theta;
++
++    // First loop, newest correction first: q = g - sum(alpha_i y_i).
++    BLAS_FUNC(dcopy)(&n, g, &one_int, z, &one_int);
++    for (i = col; i-- > 0; )
++    {
++        pointr = (head + i) % m;
++        alpha[i] = BLAS_FUNC(ddot)(
++            &n, &ws[n*pointr], &one_int, z, &one_int
++        ) / sy[i + m*i];
++        coefficient = -alpha[i];
++        BLAS_FUNC(daxpy)(
++            &n, &coefficient, &wy[n*pointr], &one_int, z, &one_int
++        );
++    }
++
++    // Apply H_0 = I/theta, then loop from oldest correction to newest.
++    BLAS_FUNC(dscal)(&n, &scale, z, &one_int);
++    for (i = 0; i < col; i++)
++    {
++        pointr = (head + i) % m;
++        beta = BLAS_FUNC(ddot)(
++            &n, &wy[n*pointr], &one_int, z, &one_int
++        ) / sy[i + m*i];
++        coefficient = alpha[i] - beta;
++        BLAS_FUNC(daxpy)(
++            &n, &coefficient, &ws[n*pointr], &one_int, z, &one_int
++        );
++    }
++
++    // mainlb expects z to be the trial point, not merely the direction.
++    BLAS_FUNC(dscal)(&n, &minus_one, z, &one_int);
++    BLAS_FUNC(daxpy)(&n, &one, x, &one_int, z, &one_int);
++}
++
++
+ void
+ errclb(CBLAS_INT n, CBLAS_INT m, double factr, double* l,
+        double* u, CBLAS_INT* nbd, CBLAS_INT* task, CBLAS_INT* task_msg, CBLAS_INT* info,

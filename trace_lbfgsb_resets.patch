@@ -1,0 +1,54 @@
+diff --git a/scipy/optimize/src/lbfgsb.c b/scipy/optimize/src/lbfgsb.c
+--- a/scipy/optimize/src/lbfgsb.c
++++ b/scipy/optimize/src/lbfgsb.c
+@@ -1,4 +1,5 @@
+ #include "lbfgsb.h"
++#include <stdio.h>
+ 
+ 
+ enum Status {
+@@ -809,6 +810,8 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+                 col, head, wa, &wa[2*m], &wa[4*m], &wa[6*m], &nseg, sbgnrm, &info);
+             if (info != 0)
+             {
++                fprintf(stderr, "LBFGSB_RESET site=cauchy iter=%lld info=%lld col=%lld\n",
++                        (long long)iter, (long long)info, (long long)col);
+                 // Singular triangular system detected; refresh the lbfgs memory.
+                 info = 0;
+                 col = 0;
+@@ -854,6 +857,8 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+             }
+             if (info != 0)
+             {
++                fprintf(stderr, "LBFGSB_RESET site=formk iter=%lld info=%lld col=%lld\n",
++                        (long long)iter, (long long)info, (long long)col);
+                 // nonpositive definiteness in Cholesky factorization;
+                 // refresh the lbfgs memory and restart the iteration.
+                 info = 0;
+@@ -878,6 +883,8 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+             
+             if (info != 0)
+             {
++                fprintf(stderr, "LBFGSB_RESET site=subsm iter=%lld info=%lld col=%lld\n",
++                        (long long)iter, (long long)info, (long long)col);
+                 // singular triangular system detected;
+                 // refresh the lbfgs memory and restart the iteration.
+                 info = 0;
+@@ -936,6 +943,8 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+                 return;
+             } else {
+                 // Refresh the lbfgs memory and restart the iteration.
++                fprintf(stderr, "LBFGSB_RESET site=lnsrlb iter=%lld info=%lld col=%lld\n",
++                        (long long)iter, (long long)info, (long long)col);
+                 if (info == 0) { nfgv--; }
+                 info = 0;
+                 col = 0;
+@@ -1055,6 +1064,8 @@ mainlb(CBLAS_INT n, CBLAS_INT m, double* x, double* l, double* u,
+ 
+         if (info != 0)
+         {
++            fprintf(stderr, "LBFGSB_RESET site=formt iter=%lld info=%lld col=%lld\n",
++                    (long long)iter, (long long)info, (long long)col);
+             // Nonpositive definiteness in Cholesky factorization;
+             // refresh the lbfgs memory and restart the iteration.
+             info = 0;

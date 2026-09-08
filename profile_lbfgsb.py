@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 
 import numpy as np
 import scipy
@@ -43,6 +44,7 @@ def main() -> None:
     if args.bounds == "box":
         bounds = Bounds(np.zeros(args.dimension), np.full(args.dimension, 2.0))
 
+    start = time.perf_counter()
     with threadpool_limits(args.threads, user_api="blas"):
         print(json.dumps({
             "scipy_file": scipy.__file__,
@@ -69,6 +71,8 @@ def main() -> None:
             if result.nit != args.iterations:
                 raise RuntimeError(f"unexpected termination: {result.message}")
             print(f"repeat={repeat + 1}/{args.repeats}, nit={result.nit}, nfev={result.nfev}")
+
+    print(f"total_elapsed_seconds={time.perf_counter() - start:.6f}")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import platform
 import statistics
 import sys
@@ -194,7 +195,8 @@ def main() -> None:
                     )
                 )
 
-    output = HERE / "results" / f"{backend}.json"
+    results_dir = Path(os.environ.get("LBFGSB_RESULTS_DIR", HERE / "results"))
+    output = results_dir / f"{backend}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
 
     data = {
