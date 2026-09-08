@@ -12,8 +12,27 @@ import scipy
 from scipy.optimize import minimize
 from threadpoolctl import threadpool_info, threadpool_limits
 
-
-DIMENSIONS = (1_000, 10_000, 100_000, 1_000_000)
+DIMENSIONS = (
+    500,
+    1_000,
+    3_000,
+    5_000,
+    7_500,
+    9_000,
+    10_000,
+    11_000,
+    12_000,
+    13_000,
+    14_000,
+    15_000,
+    20_000,
+    30_000,
+    50_000,
+    75_000,
+    100_000,
+    300_000,
+    1_000_000,
+)
 ITERATIONS = 300
 MEMORY = 10
 REPEATS = 3

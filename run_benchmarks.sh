@@ -29,9 +29,12 @@ run_one() {
         "$here/check_blas_backends.py" "$label"
 
     # One BLAS thread is the primary comparison; the objective uses no BLAS.
+    # sed: Remove "🐍 Launching Python..."
+    # >: Save the JSON results.
     conda run --no-capture-output -n "$env" \
         spin python --build-dir="$build" --no-build -- \
         "$here/benchmark_lbfgsb.py" \
+        | sed -n '/^{/,$p' \
         >"$here/results/$label.json"
 }
 

@@ -1,6 +1,3 @@
-$ export PYTHONPATH="/home/hirok/Hobby/scipy/build-openblas-install/usr/lib/python3.14/site-packages"
-🐍 Launching Python with PYTHONPATH="/home/hirok/Hobby/scipy/build-openblas-install/usr/lib/python3.14/site-packages"
-$ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Hobby/scipy-issue-blas-in-l-bfgs-b/benchmark_lbfgsb.py
 {
   "requested_blas_threads": 1,
   "objective_reduction": "numpy",
@@ -26,11 +23,11 @@ $ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Ho
     {
       "dimension": 1000,
       "seconds": [
-        0.031060408999110223,
-        0.02879090799979167,
-        0.028143007000835496
+        0.02968009600044752,
+        0.028524997000204166,
+        0.028123997000875534
       ],
-      "median_seconds": 0.02879090799979167,
+      "median_seconds": 0.028524997000204166,
       "iterations": 300,
       "function_evaluations": 308,
       "final_objective": -0.4981649873301345,
@@ -41,11 +38,11 @@ $ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Ho
     {
       "dimension": 10000,
       "seconds": [
-        0.19567885299875343,
-        0.21657005799897888,
-        0.1890605520002282
+        0.18655207800111384,
+        0.22111697400032426,
+        0.1965058770001633
       ],
-      "median_seconds": 0.19567885299875343,
+      "median_seconds": 0.1965058770001633,
       "iterations": 300,
       "function_evaluations": 308,
       "final_objective": -0.4981649873301345,
@@ -56,11 +53,11 @@ $ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Ho
     {
       "dimension": 100000,
       "seconds": [
-        2.583349434000411,
-        2.659893875999842,
-        2.577670978000242
+        2.5272474630000943,
+        2.540310545000466,
+        2.6334886090007785
       ],
-      "median_seconds": 2.583349434000411,
+      "median_seconds": 2.540310545000466,
       "iterations": 300,
       "function_evaluations": 308,
       "final_objective": -0.4981649873301345,
@@ -71,11 +68,11 @@ $ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Ho
     {
       "dimension": 1000000,
       "seconds": [
-        35.17692171999988,
-        43.398484233999625,
-        35.202107559998694
+        42.51653556400015,
+        48.2084255080008,
+        40.1774792419983
       ],
-      "median_seconds": 35.202107559998694,
+      "median_seconds": 42.51653556400015,
       "iterations": 300,
       "function_evaluations": 308,
       "final_objective": -0.4981649873301345,
