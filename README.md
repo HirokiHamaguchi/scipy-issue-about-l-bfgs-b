@@ -2,47 +2,40 @@
 
 ## About
 
-The purpose of this issue is to profile and benchmark the L-BFGS-B performance
-problem discussed in [#26038](https://github.com/scipy/scipy/issues/26038), and
-to provide information that may help improve the current L-BFGS-B
-implementation.
+The purpose of this issue is to profile and benchmark the L-BFGS-B performance problem discussed in [#26038](https://github.com/scipy/scipy/issues/26038), and to provide information that may help improve the current L-BFGS-B implementation.
 
 ## Benchmarking with a Conda environment linked against MKL
 
+Motivation of this issue is the following comment from the original issue:
+
 > The OpenBLAS issue is still in the back of our minds. But to eliminate this issue, I would suggest that you do the benchmarks with Conda environment linked to MKL library to get the true situation.
 
-(From [this comment](https://github.com/scipy/scipy/issues/26038#issuecomment-5438749423))
+([this comment](https://github.com/scipy/scipy/issues/26038#issuecomment-5438749423))
 
 ## Environment setup
 
-The development environments were prepared according to the following SciPy
-documentation:
+The development environments were prepared according to the following SciPy documentation:
 
 - [Contributor guide](https://scipy.github.io/devdocs/dev/contributor/contributor_toc.html)
 - [Building from source](https://scipy.github.io/devdocs/building/index.html#building-from-source)
 - [Debugging linear algebra issues](https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html)
 
-Specifically, Conda environments were created from `environment.yml`. The
-original code from the issue was then run with SciPy linked against MKL
-(`conda install "libblas=*=*mkl"`), rather than OpenBLAS
-(`conda install "libblas=*=*openblas"`). For the comparison below, separate
-OpenBLAS and MKL environments and separate SciPy build directories were used.
+Specifically, Conda environments were created from `environment.yml`.
+We run codes in envs linked against MKL (`conda install "libblas=*=*mkl"`) and OpenBLAS (`conda install "libblas=*=*openblas"`) to see the effects of the BLAS backend. For the comparison below, separate OpenBLAS and MKL environments and separate SciPy build directories were used.
+(If necessary, see also [ENV_MEMO.md](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/ENV_MEMO.md) for the detailed setup steps.)
 
 ## Benchmark setup
 
-The benchmark contains two unconstrained quadratic problems:
+The benchmark contains two unconstrained quadratic problems from the original issue:
 
 - a zero-chain quadratic, run for 300 L-BFGS-B iterations;
 - a diagonal quadratic, run for 100 L-BFGS-B iterations.
 
-Both use `maxcor=10`. Each measurement is repeated five times over dimensions
-from 500 to 1,000,000. The shaded regions in the figures show the minimum and
-maximum elapsed times, and the lines show the medians. The objective functions
-use NumPy elementwise operations and reductions rather than a BLAS dot product,
-so the comparison is not dominated by BLAS work in the objective itself.
+Both use `maxcor=10`.
+The shaded regions in the figures show the minimum and maximum elapsed times, and the lines show the medians.
+The objective functions use NumPy elementwise operations and reductions rather than a BLAS dot product, so the comparison is not dominated by BLAS work in the objective itself.
 
-Each problem was measured both with the BLAS backend's default thread setting
-and with all BLAS thread pools limited to one thread.
+Each problem was measured both with the BLAS backend's default thread setting and with all BLAS thread pools limited to one thread.
 
 ## Benchmark results
 
@@ -54,17 +47,15 @@ and with all BLAS thread pools limited to one thread.
 
 ![Diagonal quadratic benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/diagonal_quadratic.png)
 
-With one BLAS thread, OpenBLAS and MKL are nearly indistinguishable at large
-dimensions. At `n=1,000,000`, the zero-chain medians are 32.44 s for OpenBLAS
-and 32.68 s for MKL; the diagonal-quadratic medians are 10.46 s and 10.44 s,
-respectively.
+The backend's default threading is slower than one thread for these workloads in OpenBLAS, but may not in MKL.
+MKL has lower default-thread overhead, but that difference mostly disappears when both libraries are restricted to one thread.
 
-The backend's default threading is slower than one thread for these workloads.
-At `n=1,000,000`, the default-thread zero-chain times are 50.70 s for OpenBLAS
-and 39.81 s for MKL, while the diagonal-quadratic times are 15.81 s and 12.52 s.
-The slowdown becomes visible near the threading crossover around
-`n=10,000–11,000`. MKL has lower default-thread overhead, but that difference
-mostly disappears when both libraries are restricted to one thread.
+
+With one BLAS thread, OpenBLAS and MKL are nearly indistinguishable at large dimensions.
+At `n=1,000,000`, the zero-chain medians are 32.44 s for OpenBLAS and 32.68 s for MKL.
+The diagonal-quadratic medians are 10.46 s and 10.44 s, respectively.
+
+The slowdown becomes visible near the threading crossover around `n=10,000–11,000`.
 
 ## CPU profiling
 
@@ -72,17 +63,9 @@ Linux `perf` was used with DWARF call stacks on a long-running unconstrained
 zero-chain problem. The following flame graphs show the sampled user-space CPU
 stacks.
 
-### OpenBLAS
-
-![OpenBLAS flame graph PNG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-openblas.png)
-
-![OpenBLAS flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-openblas.svg)
-
-### MKL
-
-![MKL flame graph PNG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-mkl.png)
-
-![MKL flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-mkl.svg)
+| OpenBLAS | MKL |
+| --- | --- |
+| ![OpenBLAS flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-openblas.svg) | ![MKL flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-mkl.svg) |
 
 The profiles are strikingly similar:
 
