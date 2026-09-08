@@ -326,7 +326,7 @@ wheels = [
 [[package]]
 name = "scipy-issue-blas-in-l-bfgs-b"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "matplotlib" },
 ]

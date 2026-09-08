@@ -34,4 +34,6 @@ run_one "$baseline" scipy-dev-openblas build-openblas \
 run_one "$patched" scipy-dev-patched-ver1 build-patched-ver1 \
     "$here/results/patched-comparison/patched-ver1"
 
+uv run "$here/plot_patched_benchmarks.py"
+
 echo "Results written to $here/results/patched-comparison"

@@ -166,30 +166,54 @@ the subspace-minimization path and calls `formk`, `cmprlb`, and `subsm`; see
 This explains why two routines designed around the bound-constrained subspace
 formulation dominate an unconstrained profile.
 
-## Interpretation and possible next step
+## reset-trace instrumentation
 
-The current evidence suggests two separate effects:
+The instrumented reset-trace build produced zero `LBFGSB_RESET` events for the
+profiling workload. Thus, frequent history resets do not explain this
+reproducer's runtime. The recurring `formk` and `subsm` work remains the more
+direct hypothesis.
 
-1. The pronounced default-thread crossover near `n=10^4` appears with
-   OpenBLAS, but not with MKL, and disappears when OpenBLAS is restricted to one
-   thread. This points to an OpenBLAS-specific threading effect on this machine.
-2. Independently of the BLAS backend, most sampled solver CPU time is spent in
-   `formk` and `subsm` on this unconstrained workload.
+## Experimental unconstrained two-loop path
 
-Because BLAS threading behavior can differ substantially across machines, I
-do not think these results alone justify forcing L-BFGS-B to use one BLAS
-thread. A targeted change should preserve user control over the backend and
-thread count.
+I tested a small prototype patch that replaces the unconstrained
+`formk`/`cmprlb`/`subsm` path with the standard L-BFGS two-loop recursion. The
+box-constrained path is unchanged.
 
-This does not show that the L-BFGS correction history is reset every iteration.
-In the source, `col = 0` resets occur on initialization or recovery from
-factorization, triangular-solve, or line-search failures. What happens every
-accepted update in the unconstrained path is the formation and solution of the
-compact subspace system.
+### Zero-chain quadratic
+
+![Baseline and two-loop zero-chain benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/patched_zero_chain.png)
+
+### Diagonal quadratic
+
+![Baseline and two-loop diagonal benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/patched_diagonal_quadratic.png)
+
+The prototype substantially reduces the per-iteration wall time. Representative
+median speedups are:
+
+| Problem | BLAS threads | `n=10,000` | `n=100,000` | `n=1,000,000` |
+| --- | --- | ---: | ---: | ---: |
+| Zero-chain | default | 2.26x | 2.31x | 1.78x |
+| Zero-chain | 1 | 1.90x | 1.83x | 1.55x |
+| Diagonal quadratic | default | 1.98x | 2.00x | 1.84x |
+| Diagonal quadratic | 1 | 2.09x | 1.62x | 1.54x |
+
+All runs reached the same requested iteration limits. The diagonal problem also
+used the same number of function evaluations in the baseline and prototype.
+The zero-chain prototype used 309 evaluations instead of 308. Final objectives
+and gradient norms are close, but not bitwise identical; differences are most
+visible for the largest diagonal problem, where neither run has converged and
+both stop at the 100-iteration limit. These measurements therefore establish a
+large reduction in per-iteration cost, but do not by themselves establish full
+numerical equivalence.
 
 A focused follow-up would be to test an unconstrained fast path using the
 standard L-BFGS two-loop recursion, bypassing `formk`, `cmprlb`, and `subsm`
-only when no bounds are present. Such a change should be evaluated in a
-separate build against the existing implementation, checking the final point,
-objective value, gradient norm, iteration count, function evaluations, and the
-existing SciPy test suite in addition to wall-clock time.
+only when no bounds are present. Before proposing the prototype for SciPy, the
+next steps should be:
+
+1. run the existing SciPy L-BFGS-B tests against the patched build;
+2. add converged unconstrained problems and compare solutions, objectives,
+   gradients, statuses, and evaluation counts within explicit tolerances;
+3. profile the patched build to verify that `formk` and `subsm` disappear from
+   the unconstrained hot path and identify the new bottleneck;
+4. confirm that the box-constrained path is unchanged.

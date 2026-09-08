@@ -11,8 +11,8 @@ dependencies = [
     "matplotlib>=3.11.1",
 ]
 
-[project.scripts]
-scipy-issue-blas-in-l-bfgs-b = "scipy_issue_blas_in_l_bfgs_b:main"
+[tool.uv]
+package = false
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
