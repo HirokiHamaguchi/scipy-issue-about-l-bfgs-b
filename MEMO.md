@@ -1,5 +1,7 @@
 # Memo
 
+I referenced the following links:
+
 https://scipy.github.io/devdocs/dev/contributor/contributor_toc.html
 
 https://scipy.github.io/devdocs/building/index.html#building-from-source
@@ -7,6 +9,8 @@ https://scipy.github.io/devdocs/building/index.html#building-from-source
 https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html
 
 https://scipy.github.io/devdocs/building/blas_lapack.html
+
+## How to Set Up
 
 ```bash
 conda env list

@@ -1,44 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Check the conda environment.
-CURRENT_ENV=$(basename "$CONDA_DEFAULT_ENV" 2>/dev/null)
-if [ "$CURRENT_ENV" != "base" ]; then
-    echo "Error: run from conda 'base'."
+# Run this script from the Conda base environment.
+if [[ ${CONDA_DEFAULT_ENV:-} != "base" ]]; then
+    echo "Error: run from the Conda base environment." >&2
     exit 1
 fi
 
-# Run from either this directory or the sibling SciPy checkout.
 here=$(cd -- "$(dirname -- "$0")" && pwd)
 scipy=${SCIPY_DIR:-"$here/../scipy"}
 mkdir -p "$here/results"
 cd "$scipy"
 
 run_one() {
-    local label=$1 env=$2 build=$3
+    local backend=$1 env=$2 build=$3
 
     # The two SciPy builds must already exist.
-    [[ -d "$build" ]] || {
+    if [[ ! -d "$build" ]]; then
         echo "Build directory not found: $scipy/$build" >&2
         exit 1
-    }
+    fi
 
-    # Confirm that this build loaded only the intended BLAS backend.
+    # Verify that the expected SciPy and BLAS backend are loaded.
     conda run --no-capture-output -n "$env" \
         spin python --build-dir="$build" --no-build -- \
-        "$here/check_blas_backends.py" "$label"
+        "$here/check_blas_backends.py" "$backend"
 
-    # One BLAS thread is the primary comparison; the objective uses no BLAS.
-    # sed: Remove "🐍 Launching Python..."
-    # >: Save the JSON results.
+    # Python performs every experiment and writes the JSON directly.
     conda run --no-capture-output -n "$env" \
         spin python --build-dir="$build" --no-build -- \
-        "$here/benchmark_lbfgsb.py" \
-        | sed -n '/^{/,$p' \
-        >"$here/results/$label.json"
+        "$here/benchmark_lbfgsb.py"
 }
 
 run_one openblas scipy-dev-openblas build-openblas
 run_one mkl scipy-dev-mkl build-mkl
+
+# save plots
+uv run $here/plot_benchmarks.py
 
 echo "Results written to $here/results"

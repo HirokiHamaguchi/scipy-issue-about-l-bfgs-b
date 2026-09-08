@@ -1,0 +1,563 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 6K of event 'cycles:u'
+# Event count (approx.): 110386866129
+#
+# Overhead  Shared Object                                      Symbol                                                                                                                                                 IPC   [IPC Coverage]
+# ........  .................................................  .....................................................................................................................................................  ....................
+#
+    59.83%  _lbfgsb.cpython-314-x86_64-linux-gnu.so            [.] setulb                                                                                                                                             -      -            
+            |          
+            |--30.88%--subsm (inlined)
+            |          mainlb (inlined)
+            |          setulb
+            |          lbfgsb_setulb
+            |          cfunction_call (inlined)
+            |          _PyObject_MakeTpCall
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          PyEval_EvalCode
+            |          run_mod (inlined)
+            |          _PyRun_File (inlined)
+            |          _PyRun_SimpleFile
+            |          _PyRun_AnyFile
+            |          pymain_run_file_obj (inlined)
+            |          pymain_run_file (inlined)
+            |          pymain_run_python (inlined)
+            |          Py_RunMain
+            |          Py_BytesMain
+            |          0x7fe5b502a600
+            |          __libc_start_main
+            |          _start
+            |          
+            |--24.08%--formk (inlined)
+            |          mainlb (inlined)
+            |          setulb
+            |          lbfgsb_setulb
+            |          cfunction_call (inlined)
+            |          _PyObject_MakeTpCall
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          PyEval_EvalCode
+            |          run_mod (inlined)
+            |          _PyRun_File (inlined)
+            |          _PyRun_SimpleFile
+            |          _PyRun_AnyFile
+            |          pymain_run_file_obj (inlined)
+            |          pymain_run_file (inlined)
+            |          pymain_run_python (inlined)
+            |          Py_RunMain
+            |          Py_BytesMain
+            |          0x7fe5b502a600
+            |          __libc_start_main
+            |          _start
+            |          
+            |--2.10%--mainlb (inlined)
+            |          setulb
+            |          lbfgsb_setulb
+            |          cfunction_call (inlined)
+            |          _PyObject_MakeTpCall
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          PyEval_EvalCode
+            |          run_mod (inlined)
+            |          _PyRun_File (inlined)
+            |          _PyRun_SimpleFile
+            |          _PyRun_AnyFile
+            |          pymain_run_file_obj (inlined)
+            |          pymain_run_file (inlined)
+            |          pymain_run_python (inlined)
+            |          Py_RunMain
+            |          Py_BytesMain
+            |          0x7fe5b502a600
+            |          __libc_start_main
+            |          _start
+            |          
+            |--1.84%--lnsrlb (inlined)
+            |          mainlb (inlined)
+            |          setulb
+            |          lbfgsb_setulb
+            |          cfunction_call (inlined)
+            |          _PyObject_MakeTpCall
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          PyEval_EvalCode
+            |          run_mod (inlined)
+            |          _PyRun_File (inlined)
+            |          _PyRun_SimpleFile
+            |          _PyRun_AnyFile
+            |          pymain_run_file_obj (inlined)
+            |          pymain_run_file (inlined)
+            |          pymain_run_python (inlined)
+            |          Py_RunMain
+            |          Py_BytesMain
+            |          0x7fe5b502a600
+            |          __libc_start_main
+            |          _start
+            |          
+             --0.89%--cmprlb (inlined)
+                       mainlb (inlined)
+                       setulb
+                       lbfgsb_setulb
+                       cfunction_call (inlined)
+                       _PyObject_MakeTpCall
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       PyEval_EvalCode
+                       run_mod (inlined)
+                       _PyRun_File (inlined)
+                       _PyRun_SimpleFile
+                       _PyRun_AnyFile
+                       pymain_run_file_obj (inlined)
+                       pymain_run_file (inlined)
+                       pymain_run_python (inlined)
+                       Py_RunMain
+                       Py_BytesMain
+                       0x7fe5b502a600
+                       __libc_start_main
+                       _start
+
+    10.03%  libmkl_avx2.so.3                                   [.] mkl_blas_avx2_xddot                                                                                                                                -      -            
+            |
+            ---mkl_blas_avx2_xddot
+               mkl_blas_ddot
+               mkl_blas__ddot
+               |          
+               |--9.12%--matupd (inlined)
+               |          mainlb (inlined)
+               |          setulb
+               |          lbfgsb_setulb
+               |          cfunction_call (inlined)
+               |          _PyObject_MakeTpCall
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          PyEval_EvalCode
+               |          run_mod (inlined)
+               |          _PyRun_File (inlined)
+               |          _PyRun_SimpleFile
+               |          
+                --0.91%--lnsrlb (inlined)
+                          mainlb (inlined)
+                          setulb
+                          lbfgsb_setulb
+                          cfunction_call (inlined)
+                          _PyObject_MakeTpCall
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          PyEval_EvalCode
+                          run_mod (inlined)
+                          _PyRun_File (inlined)
+                          _PyRun_SimpleFile
+
+     4.42%  libmkl_avx2.so.3                                   [.] mkl_blas_avx2_xdcopy                                                                                                                               -      -            
+            |
+            ---mkl_blas_avx2_xdcopy
+               mkl_blas_dcopy
+               mkl_blas__dcopy
+               |          
+               |--2.10%--matupd (inlined)
+               |          mainlb (inlined)
+               |          setulb
+               |          lbfgsb_setulb
+               |          cfunction_call (inlined)
+               |          _PyObject_MakeTpCall
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          PyEval_EvalCode
+               |          run_mod (inlined)
+               |          _PyRun_File (inlined)
+               |          _PyRun_SimpleFile
+               |          _PyRun_AnyFile
+               |          pymain_run_file_obj (inlined)
+               |          pymain_run_file (inlined)
+               |          pymain_run_python (inlined)
+               |          Py_RunMain
+               |          Py_BytesMain
+               |          0x7fe5b502a600
+               |          __libc_start_main
+               |          _start
+               |          
+               |--0.85%--lnsrlb (inlined)
+               |          mainlb (inlined)
+               |          setulb
+               |          lbfgsb_setulb
+               |          cfunction_call (inlined)
+               |          _PyObject_MakeTpCall
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          PyEval_EvalCode
+               |          run_mod (inlined)
+               |          _PyRun_File (inlined)
+               |          _PyRun_SimpleFile
+               |          _PyRun_AnyFile
+               |          pymain_run_file_obj (inlined)
+               |          pymain_run_file (inlined)
+               |          pymain_run_python (inlined)
+               |          Py_RunMain
+               |          Py_BytesMain
+               |          0x7fe5b502a600
+               |          __libc_start_main
+               |          _start
+               |          
+               |--0.79%--subsm (inlined)
+               |          mainlb (inlined)
+               |          setulb
+               |          lbfgsb_setulb
+               |          cfunction_call (inlined)
+               |          _PyObject_MakeTpCall
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          PyEval_EvalCode
+               |          run_mod (inlined)
+               |          _PyRun_File (inlined)
+               |          _PyRun_SimpleFile
+               |          _PyRun_AnyFile
+               |          pymain_run_file_obj (inlined)
+               |          pymain_run_file (inlined)
+               |          pymain_run_python (inlined)
+               |          Py_RunMain
+               |          Py_BytesMain
+               |          0x7fe5b502a600
+               |          __libc_start_main
+               |          _start
+               |          
+                --0.65%--mainlb (inlined)
+                          setulb
+                          lbfgsb_setulb
+                          cfunction_call (inlined)
+                          _PyObject_MakeTpCall
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          PyEval_EvalCode
+                          run_mod (inlined)
+                          _PyRun_File (inlined)
+                          _PyRun_SimpleFile
+                          _PyRun_AnyFile
+                          pymain_run_file_obj (inlined)
+                          pymain_run_file (inlined)
+                          pymain_run_python (inlined)
+                          Py_RunMain
+                          Py_BytesMain
+                          0x7fe5b502a600
+                          __libc_start_main
+                          _start
+
+     2.39%  libc.so.6                                          [.] 0x0000000000197e47                                                                                                                                 -      -            
+            |          
+             --2.37%--0x7fe5b5197e47
+                       _contig_to_contig
+                       raw_array_assign_array
+                       PyArray_AssignArray
+                       |          
+                       |--1.53%--array_astype
+                       |          |          
+                       |          |--0.93%--_PyEval_EvalFrameDefault
+                       |          |          _PyEval_EvalFrame (inlined)
+                       |          |          _PyEval_Vector
+                       |          |          PyEval_EvalCode
+                       |          |          run_mod (inlined)
+                       |          |          _PyRun_File (inlined)
+                       |          |          _PyRun_SimpleFile
+                       |          |          _PyRun_AnyFile
+                       |          |          pymain_run_file_obj (inlined)
+                       |          |          pymain_run_file (inlined)
+                       |          |          pymain_run_python (inlined)
+                       |          |          Py_RunMain
+                       |          |          Py_BytesMain
+                       |          |          0x7fe5b502a600
+                       |          |          __libc_start_main
+                       |          |          _start
+                       |          |          
+                       |           --0.59%--_PyObject_VectorcallTstate (inlined)
+                       |                     PyObject_Vectorcall
+                       |                     _PyEval_EvalFrameDefault
+                       |                     _PyEval_EvalFrame (inlined)
+                       |                     _PyEval_Vector
+                       |                     PyEval_EvalCode
+                       |                     run_mod (inlined)
+                       |                     _PyRun_File (inlined)
+                       |                     _PyRun_SimpleFile
+                       |                     _PyRun_AnyFile
+                       |                     pymain_run_file_obj (inlined)
+                       |                     pymain_run_file (inlined)
+                       |                     pymain_run_python (inlined)
+                       |                     Py_RunMain
+                       |                     Py_BytesMain
+                       |                     0x7fe5b502a600
+                       |                     __libc_start_main
+                       |                     _start
+                       |          
+                        --0.84%--PyArray_NewCopy
+                                  _array_fromobject_generic
+                                  array_array
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector (inlined)
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall
+                                  dispatcher_vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall (inlined)
+                                  _PyObject_VectorcallDictTstate
+                                  _PyObject_Call_Prepend (inlined)
+                                  call_method (inlined)
+                                  slot_tp_call (inlined)
+                                  _PyObject_MakeTpCall
+                                  _PyEval_EvalFrameDefault
+
+     1.95%  _multiarray_umath.cpython-314-x86_64-linux-gnu.so  [.] DOUBLE_subtract_X86_V3                                                                                                                             -      -            
+            |
+            ---DOUBLE_subtract_X86_V3
+               generic_wrapped_legacy_loop
+               ufunc_generic_fastcall
+               _PyObject_VectorcallTstate (inlined)
+               object_vacall (inlined)
+               PyObject_CallFunctionObjArgs
+               |          
+                --1.62%--array_subtract
+                          binary_op1 (inlined)
+                          binary_op (inlined)
+                          PyNumber_Subtract
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall (inlined)
+                          _PyObject_VectorcallDictTstate
+                          _PyObject_Call_Prepend (inlined)
+                          call_method (inlined)
+                          slot_tp_call (inlined)
+                          _PyObject_MakeTpCall
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          PyEval_EvalCode
+                          run_mod (inlined)
+                          _PyRun_File (inlined)
+                          _PyRun_SimpleFile
+                          _PyRun_AnyFile
+                          pymain_run_file_obj (inlined)
+                          pymain_run_file (inlined)
+                          pymain_run_python (inlined)
+                          Py_RunMain
+                          Py_BytesMain
+                          0x7fe5b502a600
+                          __libc_start_main
+                          _start
+
+     1.64%  python3.14                                         [.] _PyEval_EvalFrameDefault                                                                                                                           -      -            
+            |          
+             --0.99%--_PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       |          
+                        --0.95%--_PyEval_Vector
+
+     1.29%  _lbfgsb.cpython-314-x86_64-linux-gnu.so            [.] projgr                                                                                                                                             -      -            
+            |
+            ---projgr
+               mainlb (inlined)
+               setulb
+               lbfgsb_setulb
+               cfunction_call (inlined)
+               _PyObject_MakeTpCall
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               run_mod (inlined)
+               _PyRun_File (inlined)
+               _PyRun_SimpleFile
+               _PyRun_AnyFile
+               pymain_run_file_obj (inlined)
+               pymain_run_file (inlined)
+               pymain_run_python (inlined)
+               Py_RunMain
+               Py_BytesMain
+               0x7fe5b502a600
+               __libc_start_main
+               _start
+
+     1.05%  libm.so.6                                          [.] fmaxf32x                                                                                                                                           -      -            
+            |
+            ---fmaxf32x
+               projgr
+               mainlb (inlined)
+               setulb
+               lbfgsb_setulb
+               cfunction_call (inlined)
+               _PyObject_MakeTpCall
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               run_mod (inlined)
+               _PyRun_File (inlined)
+               _PyRun_SimpleFile
+               _PyRun_AnyFile
+               pymain_run_file_obj (inlined)
+               pymain_run_file (inlined)
+               pymain_run_python (inlined)
+               Py_RunMain
+               Py_BytesMain
+               0x7fe5b502a600
+               __libc_start_main
+               _start
+
+     0.99%  libmkl_avx2.so.3                                   [.] mkl_blas_avx2_xdnrm2                                                                                                                               -      -            
+            |
+            ---mkl_blas_avx2_xdnrm2
+               mkl_blas__dnrm2
+               |          
+                --0.51%--lnsrlb (inlined)
+                          mainlb (inlined)
+                          setulb
+                          lbfgsb_setulb
+                          cfunction_call (inlined)
+                          _PyObject_MakeTpCall
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          PyEval_EvalCode
+                          run_mod (inlined)
+                          _PyRun_File (inlined)
+                          _PyRun_SimpleFile
+
+     0.95%  python3.14                                         [.] _Py_dict_lookup                                                                                                                                    -      -            
+     0.93%  _multiarray_umath.cpython-314-x86_64-linux-gnu.so  [.] DOUBLE_multiply_X86_V3                                                                                                                             -      -            
+            |
+            ---DOUBLE_multiply_X86_V3
+               generic_wrapped_legacy_loop
+               ufunc_generic_fastcall
+               _PyObject_VectorcallTstate (inlined)
+               object_vacall (inlined)
+               PyObject_CallFunctionObjArgs
+               array_multiply
+               binary_op1 (inlined)
+               PyNumber_Multiply
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall (inlined)
+               _PyObject_VectorcallDictTstate
+               _PyObject_Call_Prepend (inlined)
+               call_method (inlined)
+               slot_tp_call (inlined)
+               _PyObject_MakeTpCall
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               run_mod (inlined)
+               _PyRun_File (inlined)
+               _PyRun_SimpleFile
+               _PyRun_AnyFile
+               pymain_run_file_obj (inlined)
+               pymain_run_file (inlined)
+               pymain_run_python (inlined)
+               Py_RunMain
+               Py_BytesMain
+               0x7fe5b502a600
+               __libc_start_main
+               _start
+
+     0.85%  _multiarray_umath.cpython-314-x86_64-linux-gnu.so  [.] DOUBLE_equal_X86_V3                                                                                                                                -      -            
+            |
+            ---DOUBLE_equal_X86_V3
+               generic_wrapped_legacy_loop
+               ufunc_generic_fastcall
+               _PyObject_VectorcallTstate (inlined)
+               object_vacall (inlined)
+               PyObject_CallFunctionObjArgs
+               array_richcompare
+               do_richcompare (inlined)
+               PyObject_RichCompare
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector (inlined)
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall
+               dispatcher_vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               run_mod (inlined)
+               _PyRun_File (inlined)
+               _PyRun_SimpleFile
+               _PyRun_AnyFile
+               pymain_run_file_obj (inlined)
+               pymain_run_file (inlined)
+               pymain_run_python (inlined)
+               Py_RunMain
+               Py_BytesMain
+               0x7fe5b502a600
+               __libc_start_main
+               _start
+
+     0.83%  _multiarray_umath.cpython-314-x86_64-linux-gnu.so  [.] DOUBLE_add_X86_V3                                                                                                                                  -      -            
+            |
+            ---DOUBLE_add_X86_V3
+               generic_wrapped_legacy_loop
+               ufunc_generic_fastcall
+               _PyObject_VectorcallTstate (inlined)
+               object_vacall (inlined)
+               PyObject_CallFunctionObjArgs
+               binary_iop1 (inlined)
+               PyNumber_InPlaceAdd
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall (inlined)
+               _PyObject_VectorcallDictTstate
+               _PyObject_Call_Prepend (inlined)
+               call_method (inlined)
+               slot_tp_call (inlined)
+               _PyObject_MakeTpCall
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               run_mod (inlined)
+               _PyRun_File (inlined)
+               _PyRun_SimpleFile
+               _PyRun_AnyFile
+               pymain_run_file_obj (inlined)
+               pymain_run_file (inlined)
+               pymain_run_python (inlined)
+               Py_RunMain
+               Py_BytesMain
+               0x7fe5b502a600
+               __libc_start_main
+               _start
+
+     0.56%  python3.14                                         [.] _PyEval_EvalFrameDefault                                                                                                                           -      -            
+     0.56%  python3.14                                         [.] gc_collect_main.lto_priv.0                                                                                                                         -      -            
+     0.55%  python3.14                                         [.] deduce_unreachable                                                                                                                                 -      -            
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#
