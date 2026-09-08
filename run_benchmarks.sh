@@ -1,98 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-SCIPY_DIR=${SCIPY_DIR:-/home/hirok/Hobby/scipy}
-CONDA_EXE=${CONDA_EXE:-/home/hirok/anaconda3/bin/conda}
-CONDA_ENV=${CONDA_ENV:-scipy-dev}
-BUILD_JOBS=${BUILD_JOBS:-1}
-
-if [[ ! -x "$CONDA_EXE" ]]; then
-    echo "Conda executable not found: $CONDA_EXE" >&2
-    exit 1
-fi
-if [[ ! -d "$SCIPY_DIR/.git" ]]; then
-    echo "SciPy source tree not found: $SCIPY_DIR" >&2
+# Check the conda environment.
+CURRENT_ENV=$(basename "$CONDA_DEFAULT_ENV" 2>/dev/null)
+if [ "$CURRENT_ENV" != "base" ]; then
+    echo "Error: run from conda 'base'."
     exit 1
 fi
 
-eval "$("$CONDA_EXE" shell.bash hook)"
-conda activate "$CONDA_ENV"
-mkdir -p "$REPO_ROOT/results/threadpoolctl" "$REPO_ROOT/figures"
+# Run from either this directory or the sibling SciPy checkout.
+here=$(cd -- "$(dirname -- "$0")" && pwd)
+scipy=${SCIPY_DIR:-"$here/../scipy"}
+mkdir -p "$here/results"
+cd "$scipy"
 
-install_backend() {
-    local backend=$1
-    conda install -y \
-        -c conda-forge \
-        --override-channels \
-        --solver=libmamba \
-        "libblas=*=*${backend}"
+run_one() {
+    local label=$1 env=$2 build=$3
+
+    # The two SciPy builds must already exist.
+    [[ -d "$build" ]] || {
+        echo "Build directory not found: $scipy/$build" >&2
+        exit 1
+    }
+
+    # Confirm that this build loaded only the intended BLAS backend.
+    conda run --no-capture-output -n "$env" \
+        spin python --build-dir="$build" --no-build -- \
+        "$here/check_blas_backends.py" "$label"
+
+    # One BLAS thread is the primary comparison; the objective uses no BLAS.
+    conda run --no-capture-output -n "$env" \
+        spin python --build-dir="$build" --no-build -- \
+        "$here/benchmark_lbfgsb.py" \
+        >"$here/results/$label.json"
 }
 
-run_in_scipy_build() {
-    local command=$1
-    (
-        cd "$SCIPY_DIR"
-        spin run --no-build "$command"
-    )
-}
+run_one openblas scipy-dev-openblas build-openblas
+run_one mkl scipy-dev-mkl build-mkl
 
-check_backend() {
-    local backend=$1
-    local report="$REPO_ROOT/results/threadpoolctl/${backend}.json"
-    local command
-    printf -v command 'cd %q && python -m threadpoolctl -i scipy.linalg' "$REPO_ROOT"
-    echo "Checking the active BLAS implementation for $backend"
-    run_in_scipy_build "$command" | tee "$report"
-    python - "$report" "$backend" <<'PY'
-import json
-import sys
-
-with open(sys.argv[1], encoding="utf-8") as stream:
-    pools = json.load(stream)
-implementations = {
-    pool.get("internal_api")
-    for pool in pools
-    if pool.get("user_api") == "blas"
-}
-expected = sys.argv[2]
-if implementations != {expected}:
-    raise SystemExit(
-        f"Expected only BLAS implementation {expected!r}, found "
-        f"{sorted(implementations)!r}"
-    )
-PY
-}
-
-# Configure SciPy against conda-forge's generic BLAS/LAPACK shim once. The
-# implementation behind the shim can then be changed without rebuilding SciPy.
-install_backend openblas
-(
-    cd "$SCIPY_DIR"
-    spin build --clean -j "$BUILD_JOBS" \
-        -S-Dblas=blas \
-        -S-Dlapack=lapack \
-        -S-Duse-g77-abi=true
-)
-
-for backend in openblas mkl; do
-    install_backend "$backend"
-    check_backend "$backend"
-
-    printf -v benchmark_command \
-        'cd %q && python %q --backend %q --output %q' \
-        "$REPO_ROOT" \
-        "$REPO_ROOT/benchmark.py" \
-        "$backend" \
-        "$REPO_ROOT/results/${backend}.npz"
-    for argument in "$@"; do
-        printf -v argument_quoted '%q' "$argument"
-        benchmark_command+=" $argument_quoted"
-    done
-    run_in_scipy_build "$benchmark_command"
-done
-
-python "$REPO_ROOT/plot_benchmarks.py" \
-    "$REPO_ROOT/results/openblas.npz" \
-    "$REPO_ROOT/results/mkl.npz" \
-    --output-dir "$REPO_ROOT/figures"
+echo "Results written to $here/results"

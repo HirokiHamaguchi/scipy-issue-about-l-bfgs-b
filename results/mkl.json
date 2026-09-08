@@ -1,0 +1,94 @@
+$ export PYTHONPATH="/home/hirok/Hobby/scipy/build-mkl-install/usr/lib/python3.14/site-packages"
+🐍 Launching Python with PYTHONPATH="/home/hirok/Hobby/scipy/build-mkl-install/usr/lib/python3.14/site-packages"
+$ /home/hirok/anaconda3/envs/scipy-dev-mkl/bin/python3.14 -P /home/hirok/Hobby/scipy-issue-blas-in-l-bfgs-b/benchmark_lbfgsb.py
+{
+  "requested_blas_threads": 1,
+  "objective_reduction": "numpy",
+  "python": "3.14.7 | packaged by conda-forge | (main, Sep  2 2026, 21:08:32) [GCC 15.3.0]",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "numpy": "2.5.3",
+  "scipy": "2.0.0.dev0+git20260906.b881cb1",
+  "scipy_git_revision": "b881cb179463e85a74f3368f6242986d713adbdc",
+  "scipy_file": "/home/hirok/Hobby/scipy/build-mkl-install/usr/lib/python3.14/site-packages/scipy/__init__.py",
+  "threadpools": [
+    {
+      "user_api": "blas",
+      "internal_api": "mkl",
+      "num_threads": 1,
+      "prefix": "libmkl_rt",
+      "filepath": "/home/hirok/anaconda3/envs/scipy-dev-mkl/lib/libmkl_rt.so.3",
+      "version": "2026.1-Product",
+      "threading_layer": "intel"
+    },
+    {
+      "user_api": "openmp",
+      "internal_api": "openmp",
+      "num_threads": 8,
+      "prefix": "libomp",
+      "filepath": "/home/hirok/anaconda3/envs/scipy-dev-mkl/lib/libomp.so",
+      "version": null
+    }
+  ],
+  "rows": [
+    {
+      "dimension": 1000,
+      "seconds": [
+        0.031126890000450658,
+        0.029513690000385395,
+        0.03030629100067017
+      ],
+      "median_seconds": 0.03030629100067017,
+      "iterations": 300,
+      "function_evaluations": 310,
+      "final_objective": -0.4981780581476176,
+      "gradient_inf_norm": 0.000521062328983633,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 10000,
+      "seconds": [
+        0.24378452200107859,
+        0.19659313699958147,
+        0.2050761339996825
+      ],
+      "median_seconds": 0.2050761339996825,
+      "iterations": 300,
+      "function_evaluations": 310,
+      "final_objective": -0.4981780581476176,
+      "gradient_inf_norm": 0.000521062328983633,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 100000,
+      "seconds": [
+        2.90461446900008,
+        2.748748218999026,
+        2.582106580000982
+      ],
+      "median_seconds": 2.748748218999026,
+      "iterations": 300,
+      "function_evaluations": 310,
+      "final_objective": -0.4981780581476176,
+      "gradient_inf_norm": 0.000521062328983633,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 1000000,
+      "seconds": [
+        33.91637866400015,
+        34.117262075000326,
+        33.726478496999334
+      ],
+      "median_seconds": 33.91637866400015,
+      "iterations": 300,
+      "function_evaluations": 310,
+      "final_objective": -0.4981780581476176,
+      "gradient_inf_norm": 0.000521062328983633,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+$ export PYTHONPATH="/home/hirok/Hobby/scipy/build-openblas-install/usr/lib/python3.14/site-packages"
+🐍 Launching Python with PYTHONPATH="/home/hirok/Hobby/scipy/build-openblas-install/usr/lib/python3.14/site-packages"
+$ /home/hirok/anaconda3/envs/scipy-dev-openblas/bin/python3.14 -P /home/hirok/Hobby/scipy-issue-blas-in-l-bfgs-b/benchmark_lbfgsb.py
+{
+  "requested_blas_threads": 1,
+  "objective_reduction": "numpy",
+  "python": "3.14.7 | packaged by conda-forge | (main, Sep  2 2026, 21:08:32) [GCC 15.3.0]",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "numpy": "2.5.3",
+  "scipy": "2.0.0.dev0+git20260907.41eeb59",
+  "scipy_git_revision": "41eeb590207dc4d8517abd90fc824a3a240832b5",
+  "scipy_file": "/home/hirok/Hobby/scipy/build-openblas-install/usr/lib/python3.14/site-packages/scipy/__init__.py",
+  "threadpools": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libopenblas",
+      "filepath": "/home/hirok/anaconda3/envs/scipy-dev-openblas/lib/libopenblasp-r0.3.34.so",
+      "version": "0.3.34",
+      "threading_layer": "pthreads",
+      "architecture": "Haswell"
+    }
+  ],
+  "rows": [
+    {
+      "dimension": 1000,
+      "seconds": [
+        0.031060408999110223,
+        0.02879090799979167,
+        0.028143007000835496
+      ],
+      "median_seconds": 0.02879090799979167,
+      "iterations": 300,
+      "function_evaluations": 308,
+      "final_objective": -0.4981649873301345,
+      "gradient_inf_norm": 0.0005222596580973793,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 10000,
+      "seconds": [
+        0.19567885299875343,
+        0.21657005799897888,
+        0.1890605520002282
+      ],
+      "median_seconds": 0.19567885299875343,
+      "iterations": 300,
+      "function_evaluations": 308,
+      "final_objective": -0.4981649873301345,
+      "gradient_inf_norm": 0.0005222596580973793,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 100000,
+      "seconds": [
+        2.583349434000411,
+        2.659893875999842,
+        2.577670978000242
+      ],
+      "median_seconds": 2.583349434000411,
+      "iterations": 300,
+      "function_evaluations": 308,
+      "final_objective": -0.4981649873301345,
+      "gradient_inf_norm": 0.0005222596580973793,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    },
+    {
+      "dimension": 1000000,
+      "seconds": [
+        35.17692171999988,
+        43.398484233999625,
+        35.202107559998694
+      ],
+      "median_seconds": 35.202107559998694,
+      "iterations": 300,
+      "function_evaluations": 308,
+      "final_objective": -0.4981649873301345,
+      "gradient_inf_norm": 0.0005222596580973793,
+      "status": 1,
+      "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+    }
+  ]
+}

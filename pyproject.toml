@@ -1,0 +1,19 @@
+[project]
+name = "scipy-issue-blas-in-l-bfgs-b"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Hiroki Hamaguchi", email = "hari64boli64@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.11.1",
+]
+
+[project.scripts]
+scipy-issue-blas-in-l-bfgs-b = "scipy_issue_blas_in_l_bfgs_b:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
