@@ -35,7 +35,7 @@ run_one() {
 run_one openblas scipy-dev-openblas build-openblas
 run_one mkl scipy-dev-mkl build-mkl
 
-# save plots
-uv run $here/plot_benchmarks.py
+# Save plots using this repository's uv environment.
+uv run --project "$here" python "$here/plot_benchmarks.py"
 
 echo "Results written to $here/results"

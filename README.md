@@ -4,7 +4,7 @@
 
 The purpose of this issue is to profile and benchmark the L-BFGS-B performance problem discussed in [#26038](https://github.com/scipy/scipy/issues/26038), and to provide information that may help improve the current L-BFGS-B implementation.
 
-## Benchmarking with a Conda environment linked against MKL
+## Experiment overview
 
 To follow up on the discussion, I compare two independently built SciPy
 environments, one linked against OpenBLAS and the other against MKL. For each
@@ -29,7 +29,7 @@ The development environments were prepared according to the following SciPy docu
 - [Debugging linear algebra issues](https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html)
 
 Specifically, Conda environments were created from `environment.yml`.
-We run codes in envs linked against MKL (`conda install "libblas=*=*mkl"`) and OpenBLAS (`conda install "libblas=*=*openblas"`) to see the effects of the BLAS backend. For the comparison below, separate OpenBLAS and MKL environments and separate SciPy build directories were used.
+The benchmark was run in environments linked against MKL (`conda install "libblas=*=*mkl"`) and OpenBLAS (`conda install "libblas=*=*openblas"`). Separate environments and SciPy build directories were used.
 (If necessary, see also [ENV_MEMO.md](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/ENV_MEMO.md) for the detailed setup steps.)
 
 The measurements reported here were obtained in the following environment:
@@ -50,6 +50,13 @@ below should therefore not be assumed to transfer unchanged to other machines.
 
 ## Benchmark setup
 
+The
+[`benchmark_lbfgsb.py`](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/benchmark_lbfgsb.py)
+script deliberately uses L-BFGS-B without bounds because the issue concerns
+bound-oriented solver work that remains on the unconstrained path. Setting
+`ftol=0` and `gtol=0` with fixed iteration limits makes this a comparison of
+per-iteration cost rather than time to convergence.
+
 The benchmark contains two unconstrained quadratic problems from the original issue:
 
 - a zero-chain quadratic, run for 300 L-BFGS-B iterations;
@@ -62,6 +69,11 @@ The objective functions use NumPy elementwise operations and reductions rather t
 Each problem was measured both with the BLAS backend's default thread setting and with all BLAS thread pools limited to one thread.
 
 ## Benchmark results
+
+Raw results are available for
+[OpenBLAS](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/results/openblas.json)
+and [MKL](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/results/mkl.json).
+The recorded default BLAS thread counts are 8 for OpenBLAS and 4 for MKL.
 
 ### Zero-chain quadratic
 
@@ -99,37 +111,26 @@ Linux `perf` was used with DWARF call stacks on a long-running unconstrained
 zero-chain problem. The following flame graphs show the sampled user-space CPU
 stacks.
 
+BLAS was limited to one thread here to avoid the backend-specific threading
+effect and isolate costs in the solver's common C implementation.
+
 The workload is
 [`profile_lbfgsb.py`](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/profile_lbfgsb.py):
 an unconstrained zero-chain problem with 300,000 variables, `maxcor=10`, 300
 iterations, three repetitions, and one BLAS thread. The corresponding benchmark
 medians are 8.44 s per solve with OpenBLAS and 8.36 s with MKL, so the three
 solver runs take approximately 25 s per backend, excluding process startup and
-`perf` post-processing. The profiling script now also prints its directly
+`perf` post-processing. The profiling script also prints its directly
 measured total elapsed time for future runs.
 
 | OpenBLAS | MKL |
 | --- | --- |
-| ![OpenBLAS flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-openblas.svg) | ![MKL flame graph SVG](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-mkl.svg) |
+| ![OpenBLAS flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-openblas.png) | ![MKL flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/master/figures/perf-mkl.png) |
 
-The profiles are strikingly similar:
-
-| Function or region | OpenBLAS | MKL |
-| --- | ---: | ---: |
-| `setulb` shared object region | 58.18% | 59.83% |
-| `subsm` | 30.54% | 30.88% |
-| `formk` | 23.21% | 24.08% |
-| BLAS `ddot` kernel | 10.18% | 10.03% |
-| BLAS `dcopy` kernel | 4.26% | 4.42% |
-
-The dominant sampled work is therefore in the L-BFGS-B subspace machinery,
-especially `subsm` and `formk`, rather than in a backend-specific BLAS kernel.
-The near-identical shares for OpenBLAS and MKL indicate that this solver-side
-CPU cost is common to both builds. This does not conflict with the benchmark
-result above: the sharp wall-time crossover near `10^4` appears
-OpenBLAS-specific, while `formk` and `subsm` are separate algorithmic costs in
-the common SciPy C implementation. BLAS kernels are not negligible, but their
-individual shares are substantially smaller than the two SciPy C routines.
+The profiles are strikingly similar. In both, most samples attributed within
+`setulb` fall in the inlined `subsm` and `formk` routines, while the visible
+BLAS kernels are smaller. This solver-side cost is therefore common to both
+builds and is separate from the OpenBLAS wall-time crossover near `10^4`.
 
 `perf record` measures on-CPU samples. These profiles alone cannot rule out
 blocked or sleeping BLAS threads; elapsed time, task-clock, and context-switch
@@ -168,16 +169,24 @@ formulation dominate an unconstrained profile.
 
 ## reset-trace instrumentation
 
-The instrumented reset-trace build produced zero `LBFGSB_RESET` events for the
+The
+[`trace_lbfgsb_resets.patch`](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/trace_lbfgsb_resets.patch)
+instrumented build produced zero `LBFGSB_RESET` events for the
 profiling workload. Thus, frequent history resets do not explain this
 reproducer's runtime. The recurring `formk` and `subsm` work remains the more
 direct hypothesis.
 
 ## Experimental unconstrained two-loop path
 
-I tested a small prototype patch that replaces the unconstrained
+Using OpenBLAS, I tested a small
+[`unconstrained_two_loop.patch`](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/unconstrained_two_loop.patch)
+prototype that replaces the unconstrained
 `formk`/`cmprlb`/`subsm` path with the standard L-BFGS two-loop recursion. The
 box-constrained path is unchanged.
+
+Raw results are available for the
+[baseline](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/results/patched-comparison/baseline/openblas.json)
+and [prototype](https://github.com/HirokiHamaguchi/scipy-issue-blas-in-l-bfgs-b/blob/master/results/patched-comparison/patched-ver1/openblas.json).
 
 ### Zero-chain quadratic
 

@@ -28,6 +28,7 @@ conda run --no-capture-output -n scipy-dev-reset-trace \
     "$here/profile_lbfgsb.py" \
     2>"$output"
 
-count=$(grep -c '^LBFGSB_RESET' "$output" || true)
+count=$(grep -c '^LBFGSB_RESET ' "$output" || true)
+printf 'LBFGSB_RESET_COUNT=%s\n' "$count" >>"$output"
 echo "L-BFGS-B resets: $count"
 echo "Trace written to $output"
