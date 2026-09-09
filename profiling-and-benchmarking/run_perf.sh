@@ -8,7 +8,7 @@ if [[ ${CONDA_DEFAULT_ENV:-} != "base" ]]; then
 fi
 
 here=$(cd -- "$(dirname -- "$0")" && pwd)
-scipy=${SCIPY_DIR:-"$here/../scipy"}
+scipy=${SCIPY_DIR:-"$here/../../scipy"}
 flamegraph="$here/tools/FlameGraph"
 
 mkdir -p "$here/results" "$here/figures"

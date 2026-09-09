@@ -1,5 +1,5 @@
 [project]
-name = "scipy-issue-blas-in-l-bfgs-b"
+name = "scipy-issue-about-l-bfgs-b"
 version = "0.1.0"
 description = "Benchmark and profile SciPy L-BFGS-B performance"
 readme = "README.md"

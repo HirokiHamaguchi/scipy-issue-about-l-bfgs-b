@@ -7,7 +7,7 @@ if [[ ${CONDA_DEFAULT_ENV:-} != "base" ]]; then
 fi
 
 here=$(cd -- "$(dirname -- "$0")" && pwd)
-scipy="$here/../scipy-reset-trace"
+scipy="$here/../../scipy-reset-trace"
 build=build-reset-trace
 output="$here/results/lbfgsb-resets.txt"
 

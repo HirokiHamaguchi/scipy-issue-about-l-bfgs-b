@@ -8,7 +8,7 @@ if [[ ${CONDA_DEFAULT_ENV:-} != "base" ]]; then
 fi
 
 here=$(cd -- "$(dirname -- "$0")" && pwd)
-scipy=${SCIPY_DIR:-"$here/../scipy"}
+scipy=${SCIPY_DIR:-"$here/../../scipy"}
 mkdir -p "$here/results"
 cd "$scipy"
 
@@ -36,6 +36,6 @@ run_one openblas scipy-dev-openblas build-openblas
 run_one mkl scipy-dev-mkl build-mkl
 
 # Save plots using this repository's uv environment.
-uv run --project "$here" python "$here/plot_benchmarks.py"
+uv run --project "$here/.." python "$here/plot_benchmarks.py"
 
 echo "Results written to $here/results"

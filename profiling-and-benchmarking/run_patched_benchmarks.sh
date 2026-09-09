@@ -7,8 +7,8 @@ if [[ ${CONDA_DEFAULT_ENV:-} != "base" ]]; then
 fi
 
 here=$(cd -- "$(dirname -- "$0")" && pwd)
-baseline="$here/../scipy"
-patched="$here/../scipy-patched-ver1"
+baseline="$here/../../scipy"
+patched="$here/../../scipy-patched-ver1"
 
 run_one() {
     local source=$1 env=$2 build=$3 output=$4
@@ -34,6 +34,6 @@ run_one "$baseline" scipy-dev-openblas build-openblas \
 run_one "$patched" scipy-dev-patched-ver1 build-patched-ver1 \
     "$here/results/patched-comparison/patched-ver1"
 
-uv run --project "$here" python "$here/plot_patched_benchmarks.py"
+uv run --project "$here/.." python "$here/plot_patched_benchmarks.py"
 
 echo "Results written to $here/results/patched-comparison"
