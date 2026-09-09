@@ -79,7 +79,7 @@ One thread is fastest for these workloads on this machine, but I would like to e
 
 ## Experiment 2: CPU profiling
 
-Secondly, I used Linux `perf` with DWARF call stacks to sample user-space CPU stacks for
+Secondly, I used Linux `perf` to sample user-space CPU stacks for
 [`profile_lbfgsb.py`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/profile_lbfgsb.py).
 
 ### 2-1: Setup
@@ -89,13 +89,13 @@ BLAS is limited to one thread to exclude the backend-specific threading effect a
 
 ### 2-2: Results
 
-The benchmark medians are 8.44 s per solve with OpenBLAS and 8.36 s with MKL, or about 25 s for the three solves, excluding startup and `perf` post-processing.
+The benchmark medians are 8.44 s per solve with OpenBLAS and 8.36 s with MKL, excluding startup and `perf` post-processing.
 
 | OpenBLAS | MKL |
 | --- | --- |
 | ![OpenBLAS flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/perf-openblas.png) | ![MKL flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/perf-mkl.png) |
 
-The profiles are very similar.
+The profiles are similar.
 With BLAS limited to one thread, most samples within `setulb` fall in the inlined `subsm` and `formk` routines.
 This identifies a common source of per-iteration cost in both tested backends, separately from the OpenBLAS threading crossover.
 
@@ -103,6 +103,8 @@ This identifies a common source of per-iteration cost in both tested backends, s
 
 Let us investigate the implementation of L-BFGS-B to understand why `formk` and `subsm` dominate the profile.
 The implementation of L-BFGS-B is in [`scipy/optimize/src/lbfgsb.c`](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c).
+
+Here, a correction pair consists of the step `s = x_new - x_old` and gradient difference `y = g_new - g_old`; `S` and `Y` store the most recent `s` and `y` vectors, `maxcor` is the memory limit, and `col` is the number currently stored. Free variables can move within the current subspace, whereas active variables are fixed at a bound. The generalized Cauchy point is found along the projected-gradient path and determines this free/active split. The compact matrix is a small matrix, sized in terms of `maxcor`, that represents the limited-memory Hessian information.
 
 The key point is that, once at least one correction pair has been stored, the unconstrained path skips the generalized Cauchy-point computation but continues to use the subspace-minimization machinery.
 
@@ -127,6 +129,8 @@ Finally, I tested a small prototype that replaces the unconstrained `formk`/`cmp
 ### 3-1: Setup
 
 With OpenBLAS, I tested [`unconstrained_two_loop.patch`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/unconstrained_two_loop.patch), a small prototype that replaces the unconstrained part with the standard L-BFGS two-loop recursion when there are no bounds.
+
+This is only a preliminary experiment, not a patch that I consider ready to propose in a pull request. Before pursuing such a change, I would need to understand the current solver's control flow, memory-reset behavior, and numerical behavior more deeply, and then evaluate the change with appropriate tests.
 
 ### 3-2: Results
 
