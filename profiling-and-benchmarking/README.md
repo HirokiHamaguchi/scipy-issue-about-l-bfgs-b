@@ -109,7 +109,7 @@ Here, a correction pair consists of the step `s = x_new - x_old` and gradient di
 The key point is that, once at least one correction pair has been stored, the unconstrained path skips the generalized Cauchy-point computation but continues to use the subspace-minimization machinery.
 
 `mainlb` conditionally calls `formk` at [lines 852–853](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L852-L853).
-The implementation is at [lines 1882–2240](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L1882-L2240).
+The implementation begins at [lines 1882](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L1882).
 `formk` builds and factorizes the compact matrix used for subspace minimization.
 It updates inner products involving the stored `S` and `Y` corrections and the free/active variable sets, then performs Cholesky and triangular factorizations.
 
@@ -119,7 +119,6 @@ The implementation begins at [line 2808](https://github.com/scipy/scipy/blob/41e
 It applies the compact limited-memory representation, solves the small triangular systems, constructs a Newton-like direction over the free variables, and safeguards the direction against the bounds.
 
 For an unconstrained problem with `col > 0`, `mainlb` calls `cmprlb` and `subsm`, and calls `formk` when the compact factorization must be updated.
-Please also see [lines 829–876](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L829-L876).
 This is why bound-constrained subspace routines dominate the unconstrained profile.
 
 ## Experiment 3: Prototype two-loop recursion
