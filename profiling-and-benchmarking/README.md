@@ -1,4 +1,4 @@
-# Profiling and benchmarking SciPy L-BFGS-B
+# ENH: Profiling and benchmarking SciPy L-BFGS-B
 
 ## About
 
@@ -51,7 +51,7 @@ Firstly, I ran a benchmark to compare the elapsed time of L-BFGS-B with OpenBLAS
 
 The benchmark contains two unconstrained quadratic problems from the original issue [#26038](https://github.com/scipy/scipy/issues/26038):
 
-- a zero-chain quadratic, run for 300 L-BFGS-B iterations;
+- a zero-chain quadratic, run for 300 L-BFGS-B iterations.
 - a diagonal quadratic, run for 100 L-BFGS-B iterations.
 
 Each was run with the backend's default thread count and with all BLAS thread pools limited to one thread.
@@ -104,7 +104,11 @@ This identifies a common source of per-iteration cost in both tested backends, s
 Let us investigate the implementation of L-BFGS-B to understand why `formk` and `subsm` dominate the profile.
 The implementation of L-BFGS-B is in [`scipy/optimize/src/lbfgsb.c`](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c).
 
-Here, a correction pair consists of the step `s = x_new - x_old` and gradient difference `y = g_new - g_old`; `S` and `Y` store the most recent `s` and `y` vectors, `maxcor` is the memory limit, and `col` is the number currently stored. Free variables can move within the current subspace, whereas active variables are fixed at a bound. The generalized Cauchy point is found along the projected-gradient path and determines this free/active split. The compact matrix is a small matrix, sized in terms of `maxcor`, that represents the limited-memory Hessian information.
+Here, a correction pair consists of the step `s = x_new - x_old` and gradient difference `y = g_new - g_old`.
+`S` and `Y` store the most recent `s` and `y` vectors, `maxcor` is the memory limit, and `col` is the number currently stored.
+Free variables can move within the current subspace, whereas active variables are fixed at a bound.
+The generalized Cauchy point is found along the projected-gradient path and determines this free/active split.
+The compact matrix is a small matrix, sized in terms of `maxcor`, that represents the limited-memory Hessian information.
 
 The key point is that, once at least one correction pair has been stored, the unconstrained path skips the generalized Cauchy-point computation but continues to use the subspace-minimization machinery.
 
@@ -129,13 +133,15 @@ Finally, I tested a small prototype that replaces the unconstrained `formk`/`cmp
 
 With OpenBLAS, I tested [`unconstrained_two_loop.patch`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/unconstrained_two_loop.patch), a small prototype that replaces the unconstrained part with the standard L-BFGS two-loop recursion when there are no bounds.
 
-This is only a preliminary experiment, not a patch that I consider ready to propose in a pull request. Before pursuing such a change, I would need to understand the current solver's control flow, memory-reset behavior, and numerical behavior more deeply, and then evaluate the change with appropriate tests.
+This is only a preliminary experiment, not a patch that I consider ready to propose in a pull request.
+Before pursuing such a change, I would need to understand the current solver's control flow, memory-reset behavior, and numerical behavior more deeply, and then evaluate the change with appropriate tests.
 
 ### 3-2: Results
 
 Raw results are available for [baseline](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/patched-comparison/baseline/openblas.json) and [prototype](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/patched-comparison/patched-ver1/openblas.json).
 
-The following figures compare the baseline and prototype under the two OpenBLAS thread settings, with shading spanning the minimum and maximum. The x-axis is the number of variables `n`, and the y-axis is the elapsed time in seconds.
+The following figures compare the baseline and prototype under the two OpenBLAS thread settings, with shading spanning the minimum and maximum.
+The x-axis is the number of variables `n`, and the y-axis is the elapsed time in seconds.
 
 ![Baseline and two-loop zero-chain benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/patched_zero_chain.png)
 
@@ -162,7 +168,7 @@ The two-loop recursion is algebraically equivalent for the same correction pairs
 
 What we have observed is mainly the following three points:
 
-- On this machine, the tested OpenBLAS configuration exhibits a threading crossover around $n=10^4$; no comparable crossover was observed with the tested MKL configuration.
+- On this machine, the tested OpenBLAS configuration exhibits a threading crossover around $n=10^4$. No comparable crossover was observed with the tested MKL configuration.
 - Independently of that crossover, single-threaded profiles show that the box-constrained subspace routines `subsm` and `formk` dominate the common solver-side CPU cost.
 - For unconstrained problems, we can confirm that using the standard L-BFGS two-loop recursion can reduce the elapsed time.
 
