@@ -12,6 +12,8 @@ https://scipy.github.io/devdocs/building/blas_lapack.html
 
 ## Conda environments
 
+We assume that `scipy` is cloned in `~/Hobby/scipy/` and this repository is cloned in `~/Hobby/scipy-issue-blas-in-l-bfgs-b/`.
+
 ```bash
 conda env list
 # only base
