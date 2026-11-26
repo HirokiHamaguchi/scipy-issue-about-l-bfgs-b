@@ -1,140 +1,60 @@
-# Memo
+# Existing environment and reproduction
 
-I referenced the following links:
+The scripts use the existing WSL Ubuntu `scipy-dev` environment. No downloads,
+installation, environment creation, or Git writes are part of the workflow.
 
-https://scipy.github.io/devdocs/dev/contributor/contributor_toc.html
+## Paths
 
-https://scipy.github.io/devdocs/building/index.html#building-from-source
+| Setting | Existing location |
+| --- | --- |
+| Python and compiler | `/home/hirok/miniforge3/envs/scipy-dev/` |
+| SciPy checkout | `/mnt/c/Users/hirok/Documents/Hobby/scipy/` |
+| Driver | `/home/hirok/scipy/build-install/usr/lib/python3.13/site-packages/` |
+| Repo | `/mnt/c/Users/hirok/Documents/Hobby/scipy-issue-about-l-bfgs-b/` |
 
-https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html
+These paths are explicit constants in `experiment.py`. The existing Python
+driver is SciPy `1.17.0.dev0+git20250826.dd36f95`, with Python 3.13.5 and
+NumPy 2.3.2. Both tested C extensions are built from the same current checkout
+using the same compiler, options, and OpenBLAS library. The proposal's kernel
+test additionally builds an exported wrapper around its exact recursion body.
 
-https://scipy.github.io/devdocs/building/blas_lapack.html
+This provides local C-core checks, rather than the coverage of a complete
+current SciPy build. A future full build and CUTEst run on the measurement
+machine are separate preparation steps.
 
-## Existing checkout after the repository rename
+## Run
 
-If the experimental machine still has the repository under its old local
-directory name, rename that checkout and update its remote before following
-the commands below:
-
-```bash
-cd ~/Hobby/
-
-mv scipy-issue-blas-in-l-bfgs-b scipy-issue-about-l-bfgs-b
-
-cd scipy-issue-about-l-bfgs-b/
-
-git remote set-url origin https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b.git
-git submodule deinit -- tools/FlameGraph
-git pull --ff-only
-git submodule sync --recursive
-git submodule update --init --recursive
-```
-
-## Conda environments
-
-We assume that `scipy` is cloned in `~/Hobby/scipy/`, this repository is
-cloned in `~/Hobby/scipy-issue-about-l-bfgs-b/`, and the files for these
-experiments are in its `profiling-and-benchmarking/` directory.
+From WSL:
 
 ```bash
-conda env list
-# only base
-
-cd ~/Hobby/scipy/
-
-conda env create -f environment.yml -n scipy-dev-openblas
-
-conda activate scipy-dev-openblas
-
-conda list | grep -E '^(libblas|libcblas|liblapack|libopenblas|openblas|mkl|mkl-devel|blas-devel)[[:space:]]'
-# check only openblas is installed
-
-# https://scipy.github.io/devdocs/building/index.html#building-from-source
-spin build --build-dir=build-openblas -j2
-
-spin python --build-dir=build-openblas --no-build -- ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/check_blas_backends.py openblas
-
-conda create --clone scipy-dev-openblas  -n scipy-dev-mkl
-
-conda activate scipy-dev-mkl
-
-# https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html
-conda install -c conda-forge --override-channels --solver=libmamba "libblas=*=*mkl" "blas-devel=*=*mkl"
-
-conda list | grep -E '^(libblas|libcblas|liblapack|libopenblas|openblas|mkl|mkl-devel|blas-devel)[[:space:]]'
-# check only mkl is installed
-
-# https://github.com/scipy/scipy/blob/main/pixi.toml?utm_source=chatgpt.com
-spin build --clean --build-dir=build-mkl --setup-args=-Dblas=mkl-dynamic-lp64-seq --setup-args=-Duse-g77-abi=true -j2
-
-spin python --build-dir=build-mkl --no-build -- ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/check_blas_backends.py mkl
+cd /mnt/c/Users/hirok/Documents/Hobby/scipy-issue-about-l-bfgs-b/profiling-and-benchmarking
+/home/hirok/miniforge3/envs/scipy-dev/bin/python -B build_proposal.py
+/home/hirok/miniforge3/envs/scipy-dev/bin/python -B validate_proposal.py
+/home/hirok/miniforge3/envs/scipy-dev/bin/python -B benchmark_proposal.py
 ```
 
-## Isolated patched environment (ver1)
+Each script has a `main()` and can also run from an editor configured to use
+that interpreter. There is no custom command-line interface. For another
+machine, prepare the user's normal SciPy development environment first, then
+update the path/compiler configuration and the available CPU constant.
 
-`unconstrained_two_loop.patch` is the performance candidate. Use a separate
-Conda environment, source clone, and build directory:
+## Outputs
 
-```bash
-cd ~/Hobby/
+Generated source copies, patched sources, compiler logs, and shared libraries
+are written under the repository's
+`tmp/codex-unconstrained-proposal-20261126-a2c7/` directory. Repeated runs reuse
+that directory. The SciPy checkout remains unchanged.
 
-git clone --no-hardlinks scipy scipy-patched-ver1
+Stable records are written under `results/unconstrained-two-loop/`:
 
-conda create --clone scipy-dev-openblas -n scipy-dev-patched-ver1
-conda activate scipy-dev-patched-ver1
+- `build.json`: hashes, checkout commit, compiler commands, and environment;
+- `validation.json`: numerical cases, dispatch probes, and upstream tests;
+- `benchmark.json`: raw timings and numerical outcomes;
+- `summary.json` and `summary.csv`: summaries derived from the raw timings.
 
-cd ~/Hobby/scipy-patched-ver1/
+The build uses GCC `-O2` without fast-math; see the
+[GCC optimization documentation][gcc]. Solver options follow the
+[SciPy L-BFGS-B documentation][options].
 
-git remote set-url origin https://github.com/scipy/scipy.git
-git submodule update --init
-
-git apply --check ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/unconstrained_two_loop.patch
-git apply ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/unconstrained_two_loop.patch
-
-spin build --build-dir=build-patched-ver1 -j2
-
-spin python --build-dir=build-patched-ver1 --no-build -- ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/check_blas_backends.py openblas
-```
-
-After setup, run the baseline and patched benchmark from Conda `base`:
-
-```bash
-cd ~/Hobby/scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/
-
-conda activate base
-
-bash run_patched_benchmarks.sh
-```
-
-## Isolated reset-trace environment
-
-```bash
-cd ~/Hobby/
-
-git clone --no-hardlinks scipy scipy-reset-trace
-
-conda create --clone scipy-dev-openblas -n scipy-dev-reset-trace
-conda activate scipy-dev-reset-trace
-
-cd ~/Hobby/scipy-reset-trace/
-
-git remote set-url origin https://github.com/scipy/scipy.git
-git submodule update --init
-
-git apply --check ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/trace_lbfgsb_resets.patch
-git apply ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/trace_lbfgsb_resets.patch
-
-spin build --build-dir=build-reset-trace -j2
-
-spin python --build-dir=build-reset-trace --no-build -- ../scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/check_blas_backends.py openblas
-```
-
-After setup, run the reset trace from Conda `base`:
-
-```bash
-cd ~/Hobby/scipy-issue-about-l-bfgs-b/profiling-and-benchmarking/
-
-conda activate base
-
-bash run_reset_trace.sh
-```
+[gcc]: https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Optimize-Options.html
+[options]: https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html

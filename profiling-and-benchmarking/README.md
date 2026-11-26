@@ -1,176 +1,132 @@
-# ENH: Profiling and benchmarking SciPy L-BFGS-B
+# Unconstrained two-loop proposal
 
-## About
+The [patch](unconstrained_two_loop.patch) replaces the unconstrained
+`formk`/`cmprlb`/`subsm` calculation with the standard L-BFGS two-loop
+recursion. Its scope is the existing branch with no bounds and `col > 0`.
+It adds 37 lines and removes 2 lines.
 
-This issue follows up on the L-BFGS-B performance problem discussed in [#26038](https://github.com/scipy/scipy/issues/26038).
-It has been pointed out that the performance of L-BFGS-B can be improved and may be affected by the BLAS backend used.
-To clarify and improve the L-BFGS-B performance, in this issue, I would like to share profiles of L-BFGS-B with OpenBLAS and MKL, and test results of a possible improvement to the unconstrained optimization problems.
+## Mathematical and implementation scope
 
-## Experiment overview and setup
+For the stored correction pairs, the recursion applies the inverse BFGS
+approximation $H$ with initial scaling $H_0 = I/\theta$. It computes the trial
+point $z = x - Hg$. The existing common code then constructs the displacement
+and runs the line search.
 
-First, I describe the experiment overview and setup.
+The first loop visits corrections from newest to oldest, and the second
+visits them from oldest to newest. `WS` and `WY` use circular storage indexed
+by `(head + i) % m`; the diagonal entries of `SY` use logical history order.
+The saved coefficients use the existing `WA` scratch space, which contains
+`8*m` doubles. No allocation is introduced, including when `m > n`.
 
-This follows a suggestion from @ilayn in the original issue:
+The first iteration and iterations with empty history retain the current
+generalized Cauchy-point path. Finite bounds retain the current subspace
+calculation, even when every variable is free. History updates, `formt`,
+memory-reset conditions, convergence tests, and the line search are retained.
+The unconstrained branch sets `iword = 0` to preserve the diagnostic for a
+subspace solution within the box.
 
-> The OpenBLAS issue is still in the back of our minds. But to eliminate this issue, I would suggest that you do the benchmarks with Conda environment linked to MKL library to get the true situation.
+The recursion and compact solve are algebraically equivalent for the same
+history, but their floating-point operations differ. Full optimization runs
+can consequently differ in iterates, line-search decisions, and evaluation
+counts. Bitwise equality is checked for the bounded path and first iteration;
+unconstrained correctness also uses independent mathematical references.
 
-([source](https://github.com/scipy/scipy/issues/26038#issuecomment-5438749423))
+## Files and reproduction
 
-I built SciPy in two separate Conda environments, linked against OpenBLAS and MKL respectively.
-I ran the same benchmarks with each backend's default thread count and with BLAS limited to one thread, then profiled the common C solver code separately.
-
-I followed the SciPy documentation for:
-
-- [Contributor guide](https://scipy.github.io/devdocs/dev/contributor/contributor_toc.html)
-- [Building from source](https://scipy.github.io/devdocs/building/index.html#building-from-source)
-- [Debugging linear algebra issues](https://scipy.github.io/devdocs/dev/contributor/debugging_linalg_issues.html)
-
-I created both Conda environments from `environment.yml`, selected MKL with `conda install "libblas=*=*mkl"` and OpenBLAS with `conda install "libblas=*=*openblas"`, and used a separate SciPy build directory for each.
-Full commands are in [ENV_MEMO.md](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/ENV_MEMO.md).
-
-Measurements were taken on:
-
-| Component | Value |
-| :---: | :---: |
-| Platform | WSL2, Linux 6.6.114.1-microsoft-standard-WSL2, x86-64 |
-| Host CPU | Intel Core i7-8565U, 4 cores / 8 logical processors |
-| Python | 3.14.7, conda-forge build |
-| NumPy | 2.5.3 |
-| SciPy | 2.0.0 development build |
-| OpenBLAS | 0.3.34, pthreads, Haswell, default 8 threads |
-| MKL | 2026.1, Intel threading layer, default 4 BLAS threads |
-
-Threading crossovers depend on the CPU, BLAS build, scheduler, and runtime.
-Their location and magnitude may differ on other machines.
-
-## Experiment 1: Benchmark
-
-Firstly, I ran a benchmark to compare the elapsed time of L-BFGS-B with OpenBLAS and MKL.
-
-### 1-1: Setup
-
-The benchmark contains two unconstrained quadratic problems from the original issue [#26038](https://github.com/scipy/scipy/issues/26038):
-
-- a zero-chain quadratic, run for 300 L-BFGS-B iterations.
-- a diagonal quadratic, run for 100 L-BFGS-B iterations.
-
-Each was run with the backend's default thread count and with all BLAS thread pools limited to one thread.
-[`benchmark_lbfgsb.py`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/benchmark_lbfgsb.py) uses L-BFGS-B without bounds to expose bound-oriented work that remains on the
-unconstrained path.
-The objectives use NumPy elementwise operations and reductions, not BLAS dot products, so BLAS work in the objective does not dominate the comparison.
-
-### 1-2: Results
-
-Raw results are available for [OpenBLAS](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/openblas.json) and [MKL](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/mkl.json).
-
-The following figures show the median elapsed time for each problem and backend, with shading spanning the minimum and maximum. The x-axis is the number of variables `n`, and the y-axis is the elapsed time in seconds.
-
-![Zero-chain quadratic benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/zero_chain.png)
-
-![Diagonal quadratic benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/diagonal_quadratic.png)
-
-With OpenBLAS's default thread count, both problems become markedly more expensive around `n=10,000–11,000`. No comparable crossover was observed with the MKL configuration tested here.
-The crossover disappears when OpenBLAS is limited to one thread, indicating that it is associated with OpenBLAS multithreading in this setup.
-
-At one thread, the backends are nearly indistinguishable at large dimensions.
-For `n=1,000,000`, the OpenBLAS and MKL medians are 32.44 s and 32.68 s for the zero-chain problem, and 10.46 s and 10.44 s for the diagonal problem.
-
-One thread is fastest for these workloads on this machine, but I would like to emphasize that the crossover can be hardware-dependent, and a global limit may hurt other workloads.
-
-## Experiment 2: CPU profiling
-
-Secondly, I used Linux `perf` to sample user-space CPU stacks for
-[`profile_lbfgsb.py`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/profile_lbfgsb.py).
-
-### 2-1: Setup
-
-The workload is an unconstrained zero-chain problem with 300,000 variables, `maxcor=10`, 300 iterations, and three repetitions.
-BLAS is limited to one thread to exclude the backend-specific threading effect and isolate the common C solver code.
-
-### 2-2: Results
-
-The benchmark medians are 8.44 s per solve with OpenBLAS and 8.36 s with MKL, excluding startup and `perf` post-processing.
-
-| OpenBLAS | MKL |
+| File | Purpose |
 | --- | --- |
-| ![OpenBLAS flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/perf-openblas.png) | ![MKL flame graph](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/perf-mkl.png) |
+| `unconstrained_two_loop.patch` | The proposed SciPy source change |
+| `experiment.py` | Paths, problem definitions, solver loading, result audits |
+| `build_proposal.py` | Isolated baseline/proposal builds and source records |
+| `validate_proposal.py` | Numerical, workspace, dispatch, and upstream checks |
+| `benchmark_proposal.py` | Paired timings and identical-binary control |
 
-The profiles are similar.
-With BLAS limited to one thread, most samples within `setulb` fall in the inlined `subsm` and `formk` routines.
-This identifies a common source of per-iteration cost in both tested backends, separately from the OpenBLAS threading crossover.
+Follow [ENV_MEMO.md](ENV_MEMO.md) to run the three scripts in the existing
+environment. They neither edit the SciPy checkout nor perform Git writes.
+Builds and generated C sources are under the configured task directory in
+`tmp/`. Stable records are under
+[`results/unconstrained-two-loop/`](results/unconstrained-two-loop/).
 
-### 2-3: Implementation Details
+The baseline C source is checked by its normalized SHA-256 before patching.
+The build record contains the patch/source/binary hashes, checkout commit,
+compiler, commands, and Python-driver version. A different source hash requires
+reviewing the patch and updating the explicit baseline configuration.
 
-Let us investigate the implementation of L-BFGS-B to understand why `formk` and `subsm` dominate the profile.
-The implementation of L-BFGS-B is in [`scipy/optimize/src/lbfgsb.c`](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c).
+## Numerical validation
 
-Here, a correction pair consists of the step `s = x_new - x_old` and gradient difference `y = g_new - g_old`.
-`S` and `Y` store the most recent `s` and `y` vectors, `maxcor` is the memory limit, and `col` is the number currently stored.
-Free variables can move within the current subspace, whereas active variables are fixed at a bound.
-The generalized Cauchy point is found along the projected-gradient path and determines this free/active split.
-The compact matrix is a small matrix, sized in terms of `maxcor`, that represents the limited-memory Hessian information.
+[`validation.json`](results/unconstrained-two-loop/validation.json) records:
 
-The key point is that, once at least one correction pair has been stored, the unconstrained path skips the generalized Cauchy-point computation but continues to use the subspace-minimization machinery.
+- 148 positive-curvature histories compared with dense inverse-BFGS updates,
+  including all circular heads, partially filled histories, and `m > n`;
+- signed-zero, subnormal, and large finite inputs;
+- guards around output/workspace arrays and checks for unchanged inputs;
+- 72 paired solver cases across dimensions and history lengths, including
+  48 bounded cases checked for bitwise-identical results and diagnostics;
+- 108 solves checked against known analytic optima;
+- first-iteration, explicitly infinite-bound, and fixed-coordinate probes;
+- three unmodified upstream Hessian tests on each of the two builds.
 
-`mainlb` conditionally calls `formk` at [lines 852–853](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L852-L853).
-The implementation begins at [lines 1882](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L1882).
-`formk` builds and factorizes the compact matrix used for subspace minimization.
-It updates inner products involving the stored `S` and `Y` corrections and the free/active variable sets, then performs Cholesky and triangular factorizations.
+The paired solver cases use `gtol=1e-10` and at most 100 iterations. The known
+optimum checks use `gtol=1e-8` and at most 4000 iterations. Every objective
+evaluation in these solver checks is checked against the bounds. Option
+semantics follow the [SciPy L-BFGS-B documentation][options].
 
-When `col > 0`, `mainlb` calls `subsm` at [lines 875–876](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L875-L876).
-The implementation begins at [line 2808](https://github.com/scipy/scipy/blob/41eeb590207dc4d8517abd90fc824a3a240832b5/scipy/optimize/src/lbfgsb.c#L2808).
-`subsm` approximately solves the box-constrained subspace problem.
-It applies the compact limited-memory representation, solves the small triangular systems, constructs a Newton-like direction over the free variables, and safeguards the direction against the bounds.
+The recorded checks passed. The maximum absolute error against dense BFGS was
+approximately `6.7e-15`; the maximum coordinate error in the analytic-optimum
+checks was approximately `6.5e-7`.
 
-For an unconstrained problem with `col > 0`, `mainlb` calls `cmprlb` and `subsm`, and calls `formk` when the compact factorization must be updated.
-This is why bound-constrained subspace routines dominate the unconstrained profile.
+The driver is an existing older SciPy installation, rather than a full build
+of the current checkout. The current checkout's `test_lbfgsb_setulb.py`
+requires a newer `HAS_ILP64` utility symbol unavailable in that driver. That
+test, the full SciPy suite, and a forced memory-reset test remain pending.
 
-## Experiment 3: Prototype two-loop recursion
+## Timing protocol
 
-Finally, I tested a small prototype that replaces the unconstrained `formk`/`cmprlb`/`subsm` path with the standard L-BFGS two-loop recursion.
+The benchmark compares `baseline` and `proposal`. `baseline_control` calls
+the same loaded module as `baseline`, measuring timing variation without any
+implementation difference.
 
-### 3-1: Setup
+- Dimensions: 1000, 10,000, and 100,000; `maxcor=10`.
+- Problems: zero-chain and diagonal quadratics, wide finite bounds, a bound
+  activated after the start, and a persistent mix of active/free variables.
+- Twelve rounds, balanced execution positions and predecessors, with
+  shuffled problem order in each round.
+- One BLAS thread and affinity to logical CPU 2.
+- Zero-chain: 300 iterations; other problems: 100 iterations.
+- `ftol=gtol=0` for these fixed-iteration timing workloads.
+- Wall time, thread CPU time, context switches, and numerical results retained
+  for each solve; audits run outside the timed interval.
 
-With OpenBLAS, I tested [`unconstrained_two_loop.patch`](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/unconstrained_two_loop.patch), a small prototype that replaces the unconstrained part with the standard L-BFGS two-loop recursion when there are no bounds.
+[`benchmark.json`](results/unconstrained-two-loop/benchmark.json) contains the
+raw observations and metadata. [`summary.csv`][summary] and
+[`summary.json`](results/unconstrained-two-loop/summary.json) report paired
+speedups as baseline time divided by candidate time. Values above one favor
+the candidate. Bootstrap intervals describe these sampled rounds; they do
+not establish a worst-case or cross-machine runtime guarantee. The
+identical-binary control should be considered alongside the proposal.
 
-This is only a preliminary experiment, not a patch that I consider ready to propose in a pull request.
-Before pursuing such a change, I would need to understand the current solver's control flow, memory-reset behavior, and numerical behavior more deeply, and then evaluate the change with appropriate tests.
+## Recorded local results
 
-### 3-2: Results
+The completed run contains 540 timed solves: 15 problem/dimension combinations,
+12 rounds, and three labels. Every solve reached its requested iteration
+limit. The proposal's median paired speedups were:
 
-Raw results are available for [baseline](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/patched-comparison/baseline/openblas.json) and [prototype](https://github.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/blob/master/profiling-and-benchmarking/results/patched-comparison/patched-ver1/openblas.json).
+| Problem | `n=1000` | `n=10,000` | `n=100,000` |
+| --- | ---: | ---: | ---: |
+| Zero-chain | 1.91 | 1.84 | 1.19 |
+| Diagonal | 2.01 | 1.80 | 1.24 |
+| Wide finite bounds | 0.96 | 0.96 | 0.98 |
+| Later bound activation | 1.01 | 1.08 | 1.00 |
+| Mixed active/free | 0.98 | 0.99 | 0.99 |
 
-The following figures compare the baseline and prototype under the two OpenBLAS thread settings, with shading spanning the minimum and maximum.
-The x-axis is the number of variables `n`, and the y-axis is the elapsed time in seconds.
+Across these cases, the identical-binary control's median speedups ranged
+from approximately 0.92 to 1.07. Bounded results, evaluation counts, and
+termination states matched the baseline bitwise in all timing rounds.
+Small timing changes on that path need to be interpreted with the control
+and the intervals in the raw summary. These observations do not prove a
+zero-overhead or worst-case runtime guarantee.
 
-![Baseline and two-loop zero-chain benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/patched_zero_chain.png)
+CUTEst measurements and additional BLAS/backend configurations remain pending.
 
-![Baseline and two-loop diagonal benchmark](https://raw.githubusercontent.com/HirokiHamaguchi/scipy-issue-about-l-bfgs-b/master/profiling-and-benchmarking/figures/patched_diagonal_quadratic.png)
-
-The prototype substantially reduces per-iteration wall time.
-Representative median speedups:
-
-| Problem | BLAS threads | `n=10,000` | `n=100,000` | `n=1,000,000` |
-| --- | --- | ---: | ---: | ---: |
-| Zero-chain | default | 2.26x | 2.31x | 1.78x |
-| Zero-chain | 1 | 1.90x | 1.83x | 1.55x |
-| Diagonal quadratic | default | 1.98x | 2.00x | 1.84x |
-| Diagonal quadratic | 1 | 2.09x | 1.62x | 1.54x |
-
-The recorded result for every configuration reached the requested iteration limit.
-Baseline and prototype used the same number of function evaluations for the diagonal problem.
-The zero-chain prototype used 309 instead of 308.
-Final objectives and gradient norms are close but not bitwise identical.
-The largest differences occur for the largest diagonal problem, where both runs stop at 100 iterations without converging.
-The two-loop recursion is algebraically equivalent for the same correction pairs, but different floating-point operation ordering can alter the line search. These timing results therefore do not establish numerical equivalence.
-
-## Discussion
-
-What we have observed is mainly the following three points:
-
-- On this machine, the tested OpenBLAS configuration exhibits a threading crossover around $n=10^4$. No comparable crossover was observed with the tested MKL configuration.
-- Independently of that crossover, single-threaded profiles show that the box-constrained subspace routines `subsm` and `formk` dominate the common solver-side CPU cost.
-- For unconstrained problems, we can confirm that using the standard L-BFGS two-loop recursion can reduce the elapsed time.
-
-We have confirmed that the elapsed time can be reduced for unconstrained problems, but I would like to hear the SciPy community's opinions.
-If you would like to see further profiling results or have any opinions on the direction of the fix, please let me know.
+[options]: https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
+[summary]: results/unconstrained-two-loop/summary.csv
