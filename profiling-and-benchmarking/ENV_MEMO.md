@@ -1,60 +1,100 @@
-# Existing environment and reproduction
+# Reproduction on Linux or WSL
 
-The scripts use the existing WSL Ubuntu `scipy-dev` environment. No downloads,
-installation, environment creation, or Git writes are part of the workflow.
+Run the commands below from this repository's `profiling-and-benchmarking/`
+directory. The recipe uses the active interpreter and relative repository
+paths. It does not require a particular username or installation directory.
 
-## Paths
+## Environment preparation by the user
 
-| Setting | Existing location |
-| --- | --- |
-| Python and compiler | `/home/hirok/miniforge3/envs/scipy-dev/` |
-| SciPy checkout | `/mnt/c/Users/hirok/Documents/Hobby/scipy/` |
-| Driver | `/home/hirok/scipy/build-install/usr/lib/python3.13/site-packages/` |
-| Repo | `/mnt/c/Users/hirok/Documents/Hobby/scipy-issue-about-l-bfgs-b/` |
-
-These paths are explicit constants in `experiment.py`. The existing Python
-driver is SciPy `1.17.0.dev0+git20250826.dd36f95`, with Python 3.13.5 and
-NumPy 2.3.2. Both tested C extensions are built from the same current checkout
-using the same compiler, options, and OpenBLAS library. The proposal's kernel
-test additionally builds an exported wrapper around its exact recursion body.
-
-This provides local C-core checks, rather than the coverage of a complete
-current SciPy build. A future full build and CUTEst run on the measurement
-machine are separate preparation steps.
-
-## Run
-
-From WSL:
+For a new machine, create the environment yourself:
 
 ```bash
-cd /mnt/c/Users/hirok/Documents/Hobby/scipy-issue-about-l-bfgs-b/profiling-and-benchmarking
-/home/hirok/miniforge3/envs/scipy-dev/bin/python -B build_proposal.py
-/home/hirok/miniforge3/envs/scipy-dev/bin/python -B validate_proposal.py
-/home/hirok/miniforge3/envs/scipy-dev/bin/python -B benchmark_proposal.py
+conda env create --file environment.yml
+conda activate scipy-lbfgsb
 ```
 
-Each script has a `main()` and can also run from an editor configured to use
-that interpreter. There is no custom command-line interface. For another
-machine, prepare the user's normal SciPy development environment first, then
-update the path/compiler configuration and the available CPU constant.
+To update the existing local development environment instead:
 
-## Outputs
+```bash
+conda env update --name scipy-dev --file environment.yml
+conda activate scipy-dev
+```
 
-Generated source copies, patched sources, compiler logs, and shared libraries
-are written under the repository's
-`tmp/codex-unconstrained-proposal-20261126-a2c7/` directory. Repeated runs reuse
-that directory. The SciPy checkout remains unchanged.
+The existing local environment was checked: Cython is 3.1.3 and Pythran is
+0.18.0, below the pinned SciPy requirements of 3.2.0 and 0.18.1. Its Python,
+NumPy, compiler, Meson, Ninja, spin, and remaining checked dependencies are
+already available. No environment update has been performed by the agent.
 
-Stable records are written under `results/unconstrained-two-loop/`:
+The environment definition pins Python, NumPy, and OpenBLAS versions, and
+lists source-build requirements. It is a dependency recipe rather than an
+exact lock for every platform-specific Conda package. Each completed build
+records the resolved Python packages; runtime records identify the actual
+BLAS implementation and version. See the [SciPy contributor build guide][build].
 
-- `build.json`: hashes, checkout commit, compiler commands, and environment;
-- `validation.json`: numerical cases, dispatch probes, and upstream tests;
-- `benchmark.json`: raw timings and numerical outcomes;
-- `summary.json` and `summary.csv`: summaries derived from the raw timings.
+## Source preparation by the user
 
-The build uses GCC `-O2` without fast-math; see the
-[GCC optimization documentation][gcc]. Solver options follow the
-[SciPy L-BFGS-B documentation][options].
+The two directories below must be ordinary SciPy checkouts at the commit in
+`manifest.json`, with initialized submodules. These Git write commands are
+for the user to run; the experiment scripts never execute them.
 
-[gcc]: https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Optimize-Options.html
-[options]: https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
+```bash
+mkdir -p build
+git clone https://github.com/scipy/scipy.git build/scipy-baseline
+git -C build/scipy-baseline checkout --detach \
+  23c62b952e710e15cedffa4221aaafc49deca0e9
+git -C build/scipy-baseline submodule update --init --recursive
+
+git clone --no-hardlinks build/scipy-baseline build/scipy-proposal
+git -C build/scipy-proposal checkout --detach \
+  23c62b952e710e15cedffa4221aaafc49deca0e9
+git -C build/scipy-proposal submodule update --init --recursive
+```
+
+The build script checks the commit, submodule status, and tracked changes.
+It accepts a clean baseline and either an unpatched proposal checkout or one
+already carrying exactly the recorded proposal. Unexpected edits are refused.
+GNU patch applies the proposal as a source-file edit; no Git index is changed.
+
+## Execute
+
+```bash
+python -B -m unittest discover -s tests -v
+python -B build_proposal.py
+python -B validate_proposal.py
+python -B benchmark_proposal.py
+```
+
+Run validation to completion before starting timing. Each entry script has
+a `main()` and can use the same interpreter from an editor. Experiment
+parameters are ordinary entries in the tracked manifest; there is no custom
+command-line interface or required experiment-specific environment variable.
+
+`build_proposal.py` invokes upstream spin separately in the two checkouts.
+Each uses its normal `build/` and `build-install/` directories. The recipe
+uses OpenBLAS, two build jobs, and `--wrap-mode=nodownload`. Compiler selection
+and activation flags come from the active development environment.
+
+The generated recursion test bridge, compiler logs, and worker logs are in
+the top-level `build/` directory. Pytest caches and compiler scratch files
+are also configured below that directory. The worker's Python import path is
+set to the requested build's installation and its provenance is verified.
+
+## Records and a clean reproduction
+
+Complete-build records are written to `results/full-scipy/`:
+
+- `build.json`: source state, packages, compiler/build options, binary hashes;
+- `validation.json`: independent references, paired outcomes, upstream tests;
+- `benchmark.json`: raw solve timings, numerical outcomes, and runtime data;
+- `summary.json` and `summary.csv`: summaries derived from those timings.
+
+Starting with no generated files, run the environment/source preparation and
+the four execution commands above. No existing native library or historical
+result is required as input. Existing generated build directories may be
+reused for incremental builds; unexpected source edits still stop the run.
+
+Historical measurements under `results/c-core-20261126/` are immutable
+observations of their recorded environment. Paths inside those records are
+historical metadata, never executable configuration for the current recipe.
+
+[build]: https://scipy.github.io/devdocs/dev/building/contributor.html

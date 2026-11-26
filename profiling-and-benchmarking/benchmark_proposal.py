@@ -3,19 +3,17 @@
 import csv
 import itertools
 import json
-import os
 import random
-import resource
 import statistics
-import time
+from contextlib import ExitStack
 
 import experiment as ex
 
-
-DIMENSIONS = (1000, 10_000, 100_000)
-REPEATS = 12
-MEMORY = 10
-SEED = 261127
+SETTINGS = ex.MANIFEST["benchmark"]
+DIMENSIONS = tuple(SETTINGS["dimensions"])
+REPEATS = SETTINGS["repeats"]
+MEMORY = SETTINGS["memory"]
+SEED = SETTINGS["seed"]
 LABELS = ("baseline", "proposal", "baseline_control")
 
 
@@ -55,12 +53,10 @@ def summarize(rows):
 
 
 def main():
-    os.sched_setaffinity(0, {ex.CPU})
-    modules = {name: ex.load_module(name) for name in ex.VARIANTS}
-    modules["baseline_control"] = modules["baseline"]
+    if REPEATS <= 0 or REPEATS % 6:
+        raise ValueError("Balanced timings require a positive multiple of six rounds")
     rng = random.Random(SEED)
     cases = [(family, n) for n in DIMENSIONS for family in ex.FAMILIES]
-    problems = {(family, n): ex.Problem(family, n) for family, n in cases}
     orders = {}
     for case in cases:
         orders[case] = []
@@ -69,43 +65,38 @@ def main():
             rng.shuffle(block)
             orders[case].extend(block)
     rows, reference_records = [], {}
-    with ex.threadpool_limits(1, user_api="blas"):
-        info = {**ex.metadata(), "affinity": sorted(os.sched_getaffinity(0)),
+    with ExitStack() as stack:
+        workers = {name: stack.enter_context(ex.VariantProcess(name)) for name in ex.VARIANTS}
+        workers["baseline_control"] = workers["baseline"]
+        info = {"runtime": {name: workers[name].request("metadata") for name in ex.VARIANTS},
                 "seed": SEED, "repeats": REPEATS, "memory": MEMORY,
                 "dimensions": DIMENSIONS, "families": ex.FAMILIES,
-                "iterations": {f: 300 if f == "zero_chain" else 100 for f in ex.FAMILIES},
+                "iterations": {f: SETTINGS["zero_chain_iterations"] if f == "zero_chain"
+                               else SETTINGS["other_iterations"] for f in ex.FAMILIES},
                 "ftol": 0.0, "gtol": 0.0,
                 "build": json.loads((ex.RESULTS / "build.json").read_text()),
                 "interpretation": "Fixed iteration workloads; bootstrap intervals describe these rounds only"}
-        for problem in problems.values():
+        for family, n in cases:
             for name in ex.VARIANTS:
-                ex.solve(modules[name], problem, iterations=5)
+                workers[name].request("warmup", family=family, n=n, memory=MEMORY, iterations=5)
         for repeat in range(REPEATS):
             shuffled = cases.copy()
             rng.shuffle(shuffled)
             for family, n in shuffled:
-                problem = problems[family, n]
                 for position, label in enumerate(orders[family, n][repeat]):
-                    before = resource.getrusage(resource.RUSAGE_THREAD)
-                    cpu_start = time.thread_time_ns()
-                    start = time.perf_counter_ns()
-                    result = ex.solve(modules[label], problem, memory=MEMORY,
-                                      iterations=300 if family == "zero_chain" else 100)
-                    elapsed = (time.perf_counter_ns() - start) / 1e9
-                    cpu_elapsed = (time.thread_time_ns() - cpu_start) / 1e9
-                    after = resource.getrusage(resource.RUSAGE_THREAD)
-                    record = ex.audit(problem, result)
+                    measured = workers[label].request(
+                        "measure", family=family, n=n, memory=MEMORY,
+                        iterations=info["iterations"][family])
+                    timing_keys = {"seconds", "thread_seconds", "voluntary_context_switches",
+                                   "involuntary_context_switches"}
+                    record = {key: value for key, value in measured.items() if key not in timing_keys}
                     # Deterministic output is checked outside the timed interval.
                     key = (family, n, "baseline" if label == "baseline_control" else label)
                     if key in reference_records:
                         assert record == reference_records[key]
                     reference_records[key] = record
                     rows.append({"family": family, "n": n, "round": repeat,
-                                 "position": position, "variant": label, "seconds": elapsed,
-                                 "thread_seconds": cpu_elapsed,
-                                 "voluntary_context_switches": after.ru_nvcsw - before.ru_nvcsw,
-                                 "involuntary_context_switches": after.ru_nivcsw - before.ru_nivcsw,
-                                 **record})
+                                 "position": position, "variant": label, **measured})
             (ex.RESULTS / "benchmark.json").write_text(json.dumps({"metadata": info, "rows": rows}, indent=2))
             print(f"Completed timing round {repeat + 1}/{REPEATS}", flush=True)
     summary = summarize(rows)

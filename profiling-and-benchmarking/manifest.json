@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "scipy": {
+    "repository": "https://github.com/scipy/scipy.git",
+    "commit": "23c62b952e710e15cedffa4221aaafc49deca0e9",
+    "core": "scipy/optimize/src/lbfgsb.c",
+    "baseline_sha256": "f2d11e19a61b4f6119657a326dde67f6f8e804bb8e83935a9644a2823e129a10",
+    "proposal_sha256": "89e25190b51833daf2bfd6b4dad26d2c927e40731d3d384d65c88b4828755421"
+  },
+  "patch": {
+    "file": "unconstrained_two_loop.patch",
+    "sha256": "c2c8dbf8546bb24d1c334b0ce2f1c3c569a97f3a1f5d7ba4cef6e2550b12524d"
+  },
+  "build": {
+    "jobs": 2,
+    "setup_args": [
+      "--wrap-mode=nodownload",
+      "-Dblas=openblas",
+      "-Dlapack=openblas"
+    ]
+  },
+  "runtime": {"blas_threads": 1, "cpu": null},
+  "benchmark": {
+    "dimensions": [1000, 10000, 100000],
+    "families": ["zero_chain", "diagonal", "wide_bounds", "late_bound", "mixed_active"],
+    "repeats": 12,
+    "memory": 10,
+    "seed": 261127,
+    "zero_chain_iterations": 300,
+    "other_iterations": 100
+  },
+  "validation": {"seed": 261126}
+}

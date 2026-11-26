@@ -9,124 +9,117 @@ It adds 37 lines and removes 2 lines.
 
 For the stored correction pairs, the recursion applies the inverse BFGS
 approximation $H$ with initial scaling $H_0 = I/\theta$. It computes the trial
-point $z = x - Hg$. The existing common code then constructs the displacement
-and runs the line search.
+point $z = x - Hg$. The common code constructs the displacement and runs the
+existing line search.
 
 The first loop visits corrections from newest to oldest, and the second
 visits them from oldest to newest. `WS` and `WY` use circular storage indexed
-by `(head + i) % m`; the diagonal entries of `SY` use logical history order.
-The saved coefficients use the existing `WA` scratch space, which contains
-`8*m` doubles. No allocation is introduced, including when `m > n`.
+by `(head + i) % m`; the diagonal of `SY` uses logical history order. The
+saved coefficients use the existing `WA` scratch space of `8*m` doubles.
+No allocation is introduced, including when `m > n`.
 
 The first iteration and iterations with empty history retain the current
 generalized Cauchy-point path. Finite bounds retain the current subspace
 calculation, even when every variable is free. History updates, `formt`,
 memory-reset conditions, convergence tests, and the line search are retained.
-The unconstrained branch sets `iword = 0` to preserve the diagnostic for a
-subspace solution within the box.
+The branch sets `iword = 0` to preserve the unconstrained diagnostic.
 
-The recursion and compact solve are algebraically equivalent for the same
-history, but their floating-point operations differ. Full optimization runs
-can consequently differ in iterates, line-search decisions, and evaluation
-counts. Bitwise equality is checked for the bounded path and first iteration;
-unconstrained correctness also uses independent mathematical references.
+The two-loop recursion and compact solve are algebraically equivalent for
+the same history. Their floating-point operations differ, so unconstrained
+iterates, line-search decisions, and evaluation counts can differ.
 
-## Files and reproduction
+## Reproducible inputs and builds
 
-| File | Purpose |
+[`manifest.json`](manifest.json) pins the upstream SciPy commit, baseline and
+proposal source hashes, patch hash, build options, and timing protocol.
+[`environment.yml`](environment.yml) defines the Linux/WSL dependencies.
+The [reproduction instructions](ENV_MEMO.md) describe user-managed setup and
+the commands to run the experiment.
+
+| File | Responsibility |
 | --- | --- |
-| `unconstrained_two_loop.patch` | The proposed SciPy source change |
-| `experiment.py` | Paths, problem definitions, solver loading, result audits |
-| `build_proposal.py` | Isolated baseline/proposal builds and source records |
-| `validate_proposal.py` | Numerical, workspace, dispatch, and upstream checks |
-| `benchmark_proposal.py` | Paired timings and identical-binary control |
+| `experiment.py` | Common problems, build paths, worker lifecycle, audits |
+| `build_proposal.py` | Prerequisites, source checks, standard SciPy builds |
+| `validate_proposal.py` | Dense BFGS, solver comparisons, upstream tests |
+| `benchmark_proposal.py` | Balanced timings and statistical summaries |
+| `experiment_worker.py` | Internal requests in one complete SciPy build |
+| `tests/test_experiment.py` | Independent checks of the objective functions |
 
-Follow [ENV_MEMO.md](ENV_MEMO.md) to run the three scripts in the existing
-environment. They neither edit the SciPy checkout nor perform Git writes.
-Builds and generated C sources are under the configured task directory in
-`tmp/`. Stable records are under
-[`results/unconstrained-two-loop/`](results/unconstrained-two-loop/).
+Prepare two SciPy checkouts at the pinned commit under `build/`. The build
+script verifies source state, applies the patch to the proposal checkout with
+GNU patch, and uses upstream `python -m spin build` for each complete SciPy.
+It preserves unexpected manual edits by refusing to overwrite them.
+Subproject downloads are disabled. The scripts perform no installation,
+environment creation, cloning, or Git writes.
 
-The baseline C source is checked by its normalized SHA-256 before patching.
-The build record contains the patch/source/binary hashes, checkout commit,
-compiler, commands, and Python-driver version. A different source hash requires
-reviewing the patch and updating the explicit baseline configuration.
+Workers use the active Python interpreter and the corresponding complete
+build's installed package. They verify package location, reported SciPy
+commit, and extension hash. Separate workers isolate the two builds without
+replacing a module inside an unrelated SciPy installation.
 
-## Numerical validation
+Generated checkouts, build products, compiler logs, and test caches are under
+`build/`, which is excluded from Git. Source pins, recipes, tests, and stable
+results are tracked. No experiment uses the agent's scratch directories.
 
-[`validation.json`](results/unconstrained-two-loop/validation.json) records:
+## Validation protocol
 
-- 148 positive-curvature histories compared with dense inverse-BFGS updates,
-  including all circular heads, partially filled histories, and `m > n`;
-- signed-zero, subnormal, and large finite inputs;
-- guards around output/workspace arrays and checks for unchanged inputs;
-- 72 paired solver cases across dimensions and history lengths, including
-  48 bounded cases checked for bitwise-identical results and diagnostics;
+`validate_proposal.py` performs:
+
+- 148 dense inverse-BFGS reference comparisons covering circular heads,
+  partial histories, and `m > n`;
+- signed-zero, subnormal, and large finite input checks;
+- input-preservation and output/workspace guard checks;
+- 72 paired solver cases, including 48 bounded cases requiring identical
+  results and diagnostics;
 - 108 solves checked against known analytic optima;
 - first-iteration, explicitly infinite-bound, and fixed-coordinate probes;
-- three unmodified upstream Hessian tests on each of the two builds.
+- the pinned SciPy's unmodified Hessian and `setulb` test modules through
+  pytest for each complete build.
 
-The paired solver cases use `gtol=1e-10` and at most 100 iterations. The known
+Paired solver checks use `gtol=1e-10` and at most 100 iterations. Analytic
 optimum checks use `gtol=1e-8` and at most 4000 iterations. Every objective
-evaluation in these solver checks is checked against the bounds. Option
-semantics follow the [SciPy L-BFGS-B documentation][options].
+evaluation in these checks is checked against the bounds. See the
+[SciPy option definitions][options].
 
-The recorded checks passed. The maximum absolute error against dense BFGS was
-approximately `6.7e-15`; the maximum coordinate error in the analytic-optimum
-checks was approximately `6.5e-7`.
-
-The driver is an existing older SciPy installation, rather than a full build
-of the current checkout. The current checkout's `test_lbfgsb_setulb.py`
-requires a newer `HAS_ILP64` utility symbol unavailable in that driver. That
-test, the full SciPy suite, and a forced memory-reset test remain pending.
+The dependency-light unit tests independently check objective gradients by
+finite differences, analytic minima, and coverage of all four bound types.
+They require NumPy and run before compiling SciPy.
 
 ## Timing protocol
 
-The benchmark compares `baseline` and `proposal`. `baseline_control` calls
-the same loaded module as `baseline`, measuring timing variation without any
-implementation difference.
+The manifest specifies dimensions 1000, 10,000, and 100,000; `maxcor=10`;
+and 12 rounds over five problem families. These are zero-chain and diagonal
+quadratics, wide finite bounds, later bound activation, and a persistent mix
+of active/free variables.
 
-- Dimensions: 1000, 10,000, and 100,000; `maxcor=10`.
-- Problems: zero-chain and diagonal quadratics, wide finite bounds, a bound
-  activated after the start, and a persistent mix of active/free variables.
-- Twelve rounds, balanced execution positions and predecessors, with
-  shuffled problem order in each round.
-- One BLAS thread and affinity to logical CPU 2.
-- Zero-chain: 300 iterations; other problems: 100 iterations.
-- `ftol=gtol=0` for these fixed-iteration timing workloads.
-- Wall time, thread CPU time, context switches, and numerical results retained
-  for each solve; audits run outside the timed interval.
+The two SciPy workers are started before timing. The parent sends requests
+sequentially, with balanced label positions and predecessors and shuffled
+problem order. The `baseline_control` label uses the same running baseline
+worker and loaded binary. Only the solve is timed inside the worker; process
+startup, request transport, problem construction, and audits are excluded.
 
-[`benchmark.json`](results/unconstrained-two-loop/benchmark.json) contains the
-raw observations and metadata. [`summary.csv`][summary] and
-[`summary.json`](results/unconstrained-two-loop/summary.json) report paired
-speedups as baseline time divided by candidate time. Values above one favor
-the candidate. Bootstrap intervals describe these sampled rounds; they do
-not establish a worst-case or cross-machine runtime guarantee. The
-identical-binary control should be considered alongside the proposal.
+Both workers use one BLAS thread and the first available logical CPU. Set
+`runtime.cpu` in the manifest to select a different available CPU explicitly.
+The actual affinity and thread pools are recorded. Zero-chain uses 300
+iterations; other problems use 100, with `ftol=gtol=0` for fixed workloads.
 
-## Recorded local results
+Wall time, thread CPU time, context switches, and numerical results are
+retained for every solve. Summaries use paired baseline/candidate time ratios
+and bootstrap intervals. Values above one favor the candidate. The intervals
+describe sampled rounds and do not establish a worst-case runtime guarantee.
 
-The completed run contains 540 timed solves: 15 problem/dimension combinations,
-12 rounds, and three labels. Every solve reached its requested iteration
-limit. The proposal's median paired speedups were:
+## Results and current status
 
-| Problem | `n=1000` | `n=10,000` | `n=100,000` |
-| --- | ---: | ---: | ---: |
-| Zero-chain | 1.91 | 1.84 | 1.19 |
-| Diagonal | 2.01 | 1.80 | 1.24 |
-| Wide finite bounds | 0.96 | 0.96 | 0.98 |
-| Later bound activation | 1.01 | 1.08 | 1.00 |
-| Mixed active/free | 0.98 | 0.99 | 0.99 |
+See the [result index](results/README.md). Complete-build outputs go to
+`results/full-scipy/`. They have not yet been produced: the existing local
+environment needs newer Cython/Pythran and the two pinned source checkouts.
 
-Across these cases, the identical-binary control's median speedups ranged
-from approximately 0.92 to 1.07. Bounded results, evaluation counts, and
-termination states matched the baseline bitwise in all timing rounds.
-Small timing changes on that path need to be interpreted with the control
-and the intervals in the raw summary. These observations do not prove a
-zero-overhead or worst-case runtime guarantee.
+The recorded C-core experiment remains under `results/c-core-20261126/`, with
+its original files unchanged. It used an older installed SciPy Python driver
+and freshly compiled C extensions, and is identified accordingly. Its numeric
+and timing results are not attributed to the complete-build recipe.
 
-CUTEst measurements and additional BLAS/backend configurations remain pending.
+A forced memory-reset test, the full SciPy suite, additional BLAS/backend
+configurations, and CUTEst remain separate pending checks.
 
 [options]: https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
-[summary]: results/unconstrained-two-loop/summary.csv

@@ -3,17 +3,18 @@
 import ctypes
 import json
 import os
-import runpy
+import subprocess
+import sys
+from contextlib import ExitStack
 
 import experiment as ex
 
-
 np = ex.np
-SEED = 261126
+SEED = ex.MANIFEST["validation"]["seed"]
 
 
 def kernel_checks():
-    library = ctypes.CDLL(str(ex.WORK / "build/proposal/direction.so"))
+    library = ctypes.CDLL(str(ex.BUILD / "direction.so"))
     kernel = library.proposal_direction
     pointer = ctypes.POINTER(ctypes.c_double)
     kernel.argtypes = [ctypes.c_int, ctypes.c_int, pointer, pointer, pointer,
@@ -82,95 +83,103 @@ class DiagnosticProbe:
             self.records.append({"updates": int(isave[30]), "iword": int(isave[36])})
 
 
-def solver_checks(modules):
+def solver_checks(variant):
+    import scipy.optimize._lbfgsb_py as wrapper
+    from scipy.optimize import _lbfgsb
+
     comparisons, accuracy = [], []
     families = (*ex.FAMILIES, "mixed_bounds")
     for n in (8, 100, 1000, 10_000):
         for memory in (1, 3, 10):
             for family in families:
-                records = {}
-                for name, module in modules.items():
-                    problem = ex.Problem(family, n, check_bounds=True)
-                    probe = DiagnosticProbe(module)
-                    try:
-                        result = ex.solve(probe, problem, memory=memory, gtol=1e-10)
-                    except AssertionError as error:
-                        error.add_note(f"variant={name}, memory={memory}, family={family}, n={n}")
-                        raise
-                    if name == "proposal" and problem.bounds is None:
-                        assert all(r["iword"] == 0 for r in probe.records if r["updates"] > 0)
-                    records[name] = {**ex.audit(problem, result),
-                                     "checked_evaluations": problem.checked_evaluations,
-                                     "diagnostics": probe.records}
-                if family not in ("zero_chain", "diagonal"):
-                    assert records["baseline"] == records["proposal"]
+                problem = ex.Problem(family, n, check_bounds=True)
+                probe = DiagnosticProbe(_lbfgsb)
+                previous = wrapper._lbfgsb
+                wrapper._lbfgsb = probe
+                try:
+                    result = ex.solve(problem, memory=memory, gtol=1e-10)
+                finally:
+                    wrapper._lbfgsb = previous
+                if variant == "proposal" and problem.bounds is None:
+                    assert all(r["iword"] == 0 for r in probe.records if r["updates"] > 0)
+                record = {**ex.audit(problem, result),
+                          "checked_evaluations": problem.checked_evaluations,
+                          "diagnostics": probe.records}
                 comparisons.append({"n": n, "memory": memory, "family": family,
-                                    "variants": records})
+                                    "result": record})
     # Known analytic optima are independent of either solver's arithmetic path.
     for n in (1, 8, 31):
         for memory in (1, 3, 10):
             for family in families:
-                for name, module in modules.items():
-                    problem = ex.Problem(family, n, check_bounds=True)
-                    result = ex.solve(module, problem, memory=memory, iterations=4000, gtol=1e-8)
-                    record = ex.audit(problem, result)
-                    error = float(np.max(np.abs(result.x - problem.solution)))
-                    assert error < 2e-4 and record["projected_gradient_inf_norm"] < 2e-7
-                    accuracy.append({"n": n, "memory": memory, "family": family,
-                                     "variant": name, "solution_maximum_error": error, **record})
+                problem = ex.Problem(family, n, check_bounds=True)
+                result = ex.solve(problem, memory=memory, iterations=4000, gtol=1e-8)
+                record = ex.audit(problem, result)
+                error = float(np.max(np.abs(result.x - problem.solution)))
+                assert error < 2e-4 and record["projected_gradient_inf_norm"] < 2e-7
+                accuracy.append({"n": n, "memory": memory, "family": family,
+                                 "solution_maximum_error": error, **record})
     return {"comparison_gtol": 1e-10, "comparison_maxiter": 100,
             "accuracy_gtol": 1e-8, "accuracy_maxiter": 4000,
             "comparisons": comparisons, "analytic_optima": accuracy}
 
 
-def dispatch_checks(modules):
+def dispatch_checks():
     rows = []
     for case in ("first_iteration", "explicit_infinite_bounds", "fixed_coordinates"):
-        records = {}
-        for name, module in modules.items():
-            problem = ex.Problem("diagonal", 1000, check_bounds=True)
-            if case == "fixed_coordinates":
-                problem.lower[:10] = problem.upper[:10] = 1.0
-            if case != "first_iteration":
-                problem.bounds = ex.Bounds(problem.lower, problem.upper)
-            result = ex.solve(module, problem, iterations=1 if case == "first_iteration" else 20)
-            records[name] = ex.audit(problem, result)
-        if case != "explicit_infinite_bounds":
-            assert records["baseline"] == records["proposal"]
-        rows.append({"case": case, "variants": records})
+        problem = ex.Problem("diagonal", 1000, check_bounds=True)
+        if case == "fixed_coordinates":
+            problem.lower[:10] = problem.upper[:10] = 1.0
+        if case != "first_iteration":
+            problem.bounds = list(zip(problem.lower, problem.upper))
+        result = ex.solve(problem, iterations=1 if case == "first_iteration" else 20)
+        rows.append({"case": case, "result": ex.audit(problem, result)})
     return rows
 
 
-def upstream_checks(modules):
-    # Use the checkout's unmodified tests. The older Python driver cannot import
-    # test_lbfgsb_setulb.py, which requires the newer HAS_ILP64 utility symbol.
-    tests = runpy.run_path(str(ex.SCIPY_SOURCE / "scipy/optimize/tests/test_lbfgsb_hessinv.py"))
-    previous = ex.wrapper._lbfgsb
-    rows = []
-    try:
-        for name, module in modules.items():
-            ex.wrapper._lbfgsb = module
-            for test in ("test_1", "test_2", "test_3"):
-                tests[test]()
-                rows.append({"variant": name, "test": test, "passed": True})
-    finally:
-        ex.wrapper._lbfgsb = previous
-    return rows
+def upstream_checks(variant):
+    log = ex.BUILD / f"upstream-{variant}.log"
+    report = ex.BUILD / f"upstream-{variant}.xml"
+    command = [sys.executable, "-B", "-m", "pytest", "--pyargs",
+               "scipy.optimize.tests.test_lbfgsb_hessinv",
+               "scipy.optimize.tests.test_lbfgsb_setulb", "-q",
+               f"--basetemp={ex.BUILD / f'pytest-{variant}'}",
+               "-o", f"cache_dir={ex.BUILD / f'pytest-cache-{variant}'}",
+               f"--junitxml={report}"]
+    scratch = ex.BUILD / f"pytest-runtime-{variant}"
+    scratch.mkdir(parents=True, exist_ok=True)
+    environment = os.environ.copy()
+    # SciPy's conftest places Hypothesis data under tempfile.gettempdir().
+    environment["TMPDIR"] = str(scratch)
+    with log.open("w") as stream:
+        result = subprocess.run(command, cwd=ex.HERE, stdin=subprocess.DEVNULL,
+                                env=environment, stdout=stream, stderr=subprocess.STDOUT)
+    if result.returncode:
+        raise RuntimeError(f"Upstream tests failed; see {log}")
+    return {"passed": True, "command": command, "junit": str(report)}
+
+
+def validate_variant(variant):
+    return {"solver": solver_checks(variant), "dispatch": dispatch_checks(),
+            "upstream": upstream_checks(variant)}
 
 
 def main():
-    os.sched_setaffinity(0, {ex.CPU})
-    modules = {name: ex.load_module(name) for name in ex.VARIANTS}
-    with ex.threadpool_limits(1, user_api="blas"):
-        output = {"metadata": ex.metadata(), "seed": SEED,
-                  "build": json.loads((ex.RESULTS / "build.json").read_text())}
-        output["kernel"] = kernel_checks()
-        print("Dense BFGS and workspace checks passed", flush=True)
-        output["solver"] = solver_checks(modules)
-        output["dispatch"] = dispatch_checks(modules)
-        output["upstream"] = upstream_checks(modules)
-    output["limitations"] = ["No forced memory-reset test", "Full SciPy suite and CUTEst not run",
-                              "Upstream setulb test requires a newer Python driver"]
+    with ExitStack() as stack:
+        workers = {name: stack.enter_context(ex.VariantProcess(name)) for name in ex.VARIANTS}
+        output = {"metadata": {name: worker.request("metadata") for name, worker in workers.items()},
+                  "seed": SEED, "build": json.loads((ex.RESULTS / "build.json").read_text())}
+        output["kernel"] = workers["proposal"].request("kernel")
+        output["variants"] = {name: worker.request("validation") for name, worker in workers.items()}
+    baseline, proposal = (output["variants"][name] for name in ex.VARIANTS)
+    for before, after in zip(baseline["solver"]["comparisons"], proposal["solver"]["comparisons"], strict=True):
+        assert (before["n"], before["memory"], before["family"]) == (after["n"], after["memory"], after["family"])
+        if before["family"] not in ("zero_chain", "diagonal"):
+            assert before["result"] == after["result"]
+    for before, after in zip(baseline["dispatch"], proposal["dispatch"], strict=True):
+        assert before["case"] == after["case"]
+        if before["case"] != "explicit_infinite_bounds":
+            assert before["result"] == after["result"]
+    output["limitations"] = ["No forced memory-reset test", "Full SciPy suite and CUTEst not run"]
     (ex.RESULTS / "validation.json").write_text(json.dumps(output, indent=2))
     print("Solver comparisons, analytic optima, dispatch, and upstream tests passed", flush=True)
 

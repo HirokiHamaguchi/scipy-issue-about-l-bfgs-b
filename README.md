@@ -11,22 +11,24 @@ The [proposal patch][patch] adds 37 lines and removes 2 lines from
 search. Problems with finite bounds retain the existing subspace calculation.
 
 - [Implementation, validation, and benchmark results][experiments]
-- [Existing environment and reproduction instructions][environment]
+- [Environment and reproduction instructions][environment]
 - [Raw build, validation, and timing records][results]
 
-The experiments compare the unmodified SciPy C core with this proposal. They
-include an identical-binary timing control, dense BFGS reference calculations,
-known analytic solutions, bounded problems, and upstream Hessian tests.
+The reproduction recipe compares complete baseline and proposal SciPy builds
+from one pinned upstream commit. The source pin, patch hash, dependencies,
+experiment code, and results are version-controlled. Native build products
+are regenerated under `profiling-and-benchmarking/build/`.
 
-The local checks use an existing SciPy Python installation with freshly built
-C extensions. Full testing in a current SciPy build and CUTEst benchmarks on
-the measurement machine remain pending.
+Recorded C-core checks are preserved with their original environment metadata.
+The complete-build recipe is implemented; execution currently requires the
+environment and source preparation described in the reproduction instructions.
+CUTEst benchmarks on the measurement machine remain pending.
 
 Background: SciPy issues [#26038][issue26038] and [#26137][issue26137].
 
 [patch]: profiling-and-benchmarking/unconstrained_two_loop.patch
 [experiments]: profiling-and-benchmarking/README.md
 [environment]: profiling-and-benchmarking/ENV_MEMO.md
-[results]: profiling-and-benchmarking/results/unconstrained-two-loop/
+[results]: profiling-and-benchmarking/results/README.md
 [issue26038]: https://github.com/scipy/scipy/issues/26038
 [issue26137]: https://github.com/scipy/scipy/issues/26137
